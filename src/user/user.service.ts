@@ -1,27 +1,34 @@
+import bcrypt from 'bcrypt'
+
 import { Injectable } from '@nestjs/common'
-import { IdT } from 'src/entities/base.entity'
+
+import { IdT } from '../entities/base.entity'
 import { db } from './db'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserT } from './entities/user.entity'
 import { genId } from './utils/genId'
+import { SafeOmit } from './utils/types'
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto): UserT {
+  create({ password, ...rest }: CreateUserDto): SafeOmit<UserT, 'password'> {
     const id = genId()
     const now = new Date()
 
-    const user: UserT = {
-      ...createUserDto,
+    const userReturn: SafeOmit<UserT, 'password'> = {
+      ...rest,
       id,
       createdAt: now,
       updatedAt: now,
     }
 
-    db.set(id, user)
+    db.set(id, {
+      ...userReturn,
+      password: bcrypt.hashSync(password, 10),
+    })
 
-    return user
+    return userReturn
   }
 
   findAll() {
