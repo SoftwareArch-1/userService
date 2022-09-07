@@ -23,11 +23,6 @@ export class UserController {
     return this.userService.create(createUserDto)
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll()
-  }
-
   @Get(':id')
   @UseZodGuard('params', idSchema)
   findOne(@Param('id') id: IdT) {

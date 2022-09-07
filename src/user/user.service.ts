@@ -32,10 +32,6 @@ export class UserService {
     return userReturn
   }
 
-  findAll() {
-    return `This action returns all user`
-  }
-
   findOne(id: IdT): SafeOmit<UserT, 'password'> {
     return stripPassword(this._findOneWithPassword(id))
   }
