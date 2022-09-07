@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 
 import { IdT } from '../entities/base.entity'
 import { db } from './db'
@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { UserT } from './entities/user.entity'
 import { genId } from './utils/genId'
 import { SafeOmit } from './utils/types'
+import { stripPassword } from './utils/stripPassword'
 
 @Injectable()
 export class UserService {
@@ -35,8 +36,12 @@ export class UserService {
     return `This action returns all user`
   }
 
-  findOne(id: IdT) {
-    return `This action returns a #${id} user`
+  findOne(id: IdT): SafeOmit<UserT, 'password'> {
+    const user = db.get(id)
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+    return stripPassword(user)
   }
 
   update(id: IdT, updateUserDto: UpdateUserDto) {
