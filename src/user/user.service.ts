@@ -54,7 +54,11 @@ export class UserService {
   }
 
   remove(id: IdT) {
-    return `This action removes a #${id} user`
+    if (db.delete(id)) {
+      return 'User deleted'
+    } else {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
   }
 
   private _findOneWithPassword(id: IdT): UserT {
