@@ -37,18 +37,31 @@ export class UserService {
   }
 
   findOne(id: IdT): SafeOmit<UserT, 'password'> {
-    const user = db.get(id)
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
-    }
-    return stripPassword(user)
+    return stripPassword(this._findOneWithPassword(id))
   }
 
-  update(id: IdT, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`
+  update(id: IdT, { password, ...rest }: UpdateUserDto) {
+    const user = this._findOneWithPassword(id)
+    const updatedUser = { ...user, ...rest }
+
+    if (password) {
+      updatedUser.password = bcrypt.hashSync(password, 10)
+    }
+
+    db.set(id, updatedUser)
+
+    return stripPassword(updatedUser)
   }
 
   remove(id: IdT) {
     return `This action removes a #${id} user`
+  }
+
+  private _findOneWithPassword(id: IdT): UserT {
+    const user = db.get(id)
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+    return user
   }
 }
