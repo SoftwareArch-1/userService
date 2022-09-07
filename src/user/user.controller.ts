@@ -17,6 +17,11 @@ import { UseZodGuard } from 'nestjs-zod'
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get()
+  findAll() {
+    return this.userService.findAll()
+  }
+
   @Post()
   @UseZodGuard('body', CreateUserDto)
   create(@Body() createUserDto: CreateUserDto) {

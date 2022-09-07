@@ -13,6 +13,10 @@ import { stripPassword } from './utils/stripPassword'
 
 @Injectable()
 export class UserService {
+  findAll() {
+    return db
+  }
+
   create({ password, ...rest }: CreateUserDto): SafeOmit<UserT, 'password'> {
     const id = genId()
     const now = new Date()
