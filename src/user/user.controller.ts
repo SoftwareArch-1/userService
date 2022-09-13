@@ -16,12 +16,6 @@ import { UseZodGuard } from 'nestjs-zod'
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Get()
-  findAll() {
-    return this.userService.findAll()
-  }
-
   @Post()
   @UseZodGuard('body', CreateUserDto)
   create(@Body() createUserDto: CreateUserDto) {
@@ -35,14 +29,12 @@ export class UserController {
   }
 
   @Patch(':id')
-  @UseZodGuard('params', idSchema)
   @UseZodGuard('body', UpdateUserDto)
   update(@Param('id') id: IdT, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto)
   }
 
   @Delete(':id')
-  @UseZodGuard('params', idSchema)
   remove(@Param('id') id: IdT) {
     return this.userService.remove(id)
   }
