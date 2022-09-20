@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt'
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 
@@ -10,56 +10,75 @@ import { genId } from './utils/genId'
 import { SafeOmit } from './utils/types'
 import { stripPassword } from './utils/stripPassword'
 
+import { prismaClient } from '../../prisma/script'
+
 @Injectable()
 export class UserService {
-  create({ password, ...rest }: CreateUserDto): SafeOmit<UserT, 'password'> {
-    const id = genId()
-    const now = new Date()
+  create({ password, ...rest }: CreateUserDto) {
+    const createdUser = prismaClient.user.create({
+      data: {
+        password: bcrypt.hashSync(password, 10),
+        ...rest,
+      },
+    })
 
-    // has password?
-    // upload to db
-
-    const userReturn: SafeOmit<UserT, 'password'> = {
-      ...rest,
-      id,
-      createdAt: now,
-      updatedAt: now,
-    }
-
-    return userReturn
+    return createdUser
   }
 
-  findOne(id: IdT): SafeOmit<UserT, 'password'> {
-    return {
-      createdAt: new Date(),
-      email: 'email@exmaple.com',
-      id,
-      name: 'name',
-      updatedAt: new Date(),
+  findAll() {
+    const users = prismaClient.user.findMany()
+    return users
+  }
+
+  findOne(id: IdT) {
+    //find in prisma
+    const user = prismaClient.user.findUnique({
+      where: {
+        id: id,
+      },
+    })
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
+    return user
   }
 
   update(id: IdT, { password, ...rest }: UpdateUserDto) {
-    const user = this._findOneWithPassword(id)
-
+    const user = prismaClient.user.findUnique({
+      where: {
+        id: id,
+      },
+    })
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
 
-    const updatedUser = { ...user, ...rest }
-
     if (password) {
-      updatedUser.password = bcrypt.hashSync(password, 10)
-    }
-
-    return stripPassword(updatedUser)
+      return prismaClient.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          password: bcrypt.hashSync(password, 10),
+        },
+      })
+    } else
+      return prismaClient.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...rest,
+        },
+      })
   }
 
   remove(id: IdT) {
-    // TODO: implement
-  }
-
-  private _findOneWithPassword(id: IdT): UserT | null {
-    return null
+    const deleteUsers = prismaClient.user.deleteMany({
+      where: {
+        id: id,
+      },
+    })
+    return deleteUsers
   }
 }
