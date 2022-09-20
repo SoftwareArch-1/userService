@@ -16,10 +16,16 @@ import { UseZodGuard } from 'nestjs-zod'
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @Post()
   @UseZodGuard('body', CreateUserDto)
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto)
+  }
+
+  @Get()
+  findAll() {
+    return this.userService.findAll()
   }
 
   @Get(':id')
