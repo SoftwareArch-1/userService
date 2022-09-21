@@ -1,4 +1,3 @@
-import { idSchema, IdT } from './../entities/base.entity'
 import {
   Controller,
   Get,
@@ -29,19 +28,18 @@ export class UserController {
   }
 
   @Get(':id')
-  @UseZodGuard('params', idSchema)
-  findOne(@Param('id') id: IdT) {
+  findOne(@Param('id') id: string) {
     return this.userService.findOne(id)
   }
 
   @Patch(':id')
   @UseZodGuard('body', UpdateUserDto)
-  update(@Param('id') id: IdT, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: IdT) {
+  remove(@Param('id') id: string) {
     return this.userService.remove(id)
   }
 }
