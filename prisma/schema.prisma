@@ -20,7 +20,8 @@ model User {
   name    String
   surname String
 
-  reviews Review[] @relation("reviews")
+  reviews Review[] @relation("reviewee") // reviews written to this user
+  r       Review[] @relation("reviewer") // ignore this
 }
 
 model Review {
@@ -32,6 +33,7 @@ model Review {
   stars   Int
 
   revieweeId String
-  reviewee   User   @relation(fields: [revieweeId], references: [id], onDelete: Cascade, name: "reviews")
+  reviewee   User   @relation(fields: [revieweeId], references: [id], onDelete: Cascade, name: "reviewee")
   reviewerId String
+  reviewer   User   @relation(fields: [reviewerId], references: [id], onDelete: SetNull, name: "reviewer")
 }

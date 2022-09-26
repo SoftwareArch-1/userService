@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { User } from '@prisma/client'
+import { Review } from '@prisma/client'
 import { prismaClient } from 'prisma/script'
 import { CreateReviewDto } from './dto/createReview.dto'
 
@@ -30,22 +30,13 @@ export class ReviewService {
     return '👌'
   }
 
-  async countReviewStars(userId: User['id']): Promise<{
+  async countReviewStars(reviews: { stars: number }[]): Promise<{
     1: number
     2: number
     3: number
     4: number
     5: number
   }> {
-    const reviews = await prismaClient.review.findMany({
-      where: {
-        revieweeId: userId,
-      },
-      select: {
-        stars: true,
-      },
-    })
-
     const result = {
       1: 0,
       2: 0,
