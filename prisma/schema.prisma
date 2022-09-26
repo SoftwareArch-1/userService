@@ -19,4 +19,18 @@ model User {
 
   name    String
   surname String
+
+  reviews Review[] @relation("reviews")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  content String
+  stars   Int
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade, name: "reviews")
 }
