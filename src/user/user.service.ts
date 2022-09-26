@@ -8,9 +8,16 @@ import { SafeOmit } from './utils/types'
 import { stripPassword } from './utils/stripPassword'
 
 import { prismaClient } from '../../prisma/script'
+import { ReviewService } from 'src/review/review.service'
+import {
+  findOneUserResponseDto,
+  FindOneUserResponseDto,
+} from './dto/find-one-response.dto'
 
 @Injectable()
 export class UserService {
+  constructor(private readonly reviewService: ReviewService) {}
+
   async create({ password, ...rest }: CreateUserDto) {
     try {
       const createdUser = await prismaClient.user.create({
@@ -30,17 +37,47 @@ export class UserService {
     return users
   }
 
-  async findOne(id: string) {
-    //find in prisma
+  async findOne(id: string): Promise<FindOneUserResponseDto> {
     const user = await prismaClient.user.findUnique({
       where: {
-        id: id,
+        id,
+      },
+      select: {
+        name: true,
+        surname: true,
+        email: true,
+        id: true,
       },
     })
+
     if (!user) {
-      throw new HttpException('User not found.', HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found', 404)
     }
-    return stripPassword(user)
+
+    const reviews = await prismaClient.review.findMany({
+      where: {
+        revieweeId: id,
+      },
+      select: {
+        id: true,
+        content: true,
+        stars: true,
+        reviewer: {
+          select: {
+            name: true,
+            surname: true,
+          },
+        },
+      },
+    })
+
+    const stars = this.reviewService.countReviewStars(reviews)
+
+    return findOneUserResponseDto.parse({
+      reviews,
+      stars,
+      profile: user,
+    })
   }
 
   update(id: string, { password, ...rest }: UpdateUserDto) {

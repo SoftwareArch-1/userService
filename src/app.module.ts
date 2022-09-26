@@ -6,7 +6,7 @@ import { ReviewModule } from './review/review.module'
 import { AppService } from './app.service'
 
 @Module({
-  imports: [UserModule, AuthModule, ReviewModule],
+  imports: [AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,16 +1,23 @@
+import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
+
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
+  Controller,
+  // Delete,
+  Get,
   Param,
-  Delete,
+  Patch,
+  Post,
 } from '@nestjs/common'
-import { UserService } from './user.service'
+import { ApiResponse } from '@nestjs/swagger'
+
 import { CreateUserDto } from './dto/create-user.dto'
+import {
+  findOneUserResponseDto,
+  FindOneUserResponseDto,
+} from './dto/find-one-response.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { UseZodGuard } from 'nestjs-zod'
+import { UserService } from './user.service'
 
 @Controller('user')
 export class UserController {
@@ -22,13 +29,16 @@ export class UserController {
     return this.userService.create(createUserDto)
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll()
-  }
+  // @Get()
+  // findAll() {
+  //   return this.userService.findAll()
+  // }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @ApiResponse({
+    schema: zodToOpenAPI(findOneUserResponseDto),
+  })
+  findOne(@Param('id') id: string): Promise<FindOneUserResponseDto> {
     return this.userService.findOne(id)
   }
 
@@ -38,8 +48,8 @@ export class UserController {
     return this.userService.update(id, updateUserDto)
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id)
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.userService.remove(id)
+  // }
 }
