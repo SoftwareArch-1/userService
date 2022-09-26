@@ -47,7 +47,7 @@ export class AppService {
       },
     })
 
-    const stars = await this.reviewService.countReviewStars(reviews)
+    const stars = this.reviewService.countReviewStars(reviews)
 
     return {
       reviews,

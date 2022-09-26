@@ -29,13 +29,13 @@ export class ReviewService {
     return '👌'
   }
 
-  async countReviewStars(reviews: { stars: number }[]): Promise<{
+  countReviewStars(reviews: { stars: number }[]): {
     1: number
     2: number
     3: number
     4: number
     5: number
-  }> {
+  } {
     const result = {
       1: 0,
       2: 0,
