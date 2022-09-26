@@ -1,10 +1,11 @@
 import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
+import { strippedPasswordUserSchema } from 'prisma/zod-models/user.entity'
 
 import {
   Body,
   Controller,
-  // Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -18,6 +19,7 @@ import {
 } from './dto/find-one-response.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserService } from './user.service'
+import { HttpStatus } from '@nestjs/common/enums'
 
 @Controller('user')
 export class UserController {
@@ -25,8 +27,15 @@ export class UserController {
 
   @Post()
   @UseZodGuard('body', CreateUserDto)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto)
+  @ApiResponse({
+    schema: zodToOpenAPI(strippedPasswordUserSchema),
+    status: HttpStatus.CREATED,
+  })
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createUserDto: CreateUserDto) {
+    return strippedPasswordUserSchema.parse(
+      await this.userService.create(createUserDto),
+    )
   }
 
   // @Get()

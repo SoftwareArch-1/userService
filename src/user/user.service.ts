@@ -1,18 +1,17 @@
 import * as bcrypt from 'bcrypt'
+import { userSchema } from 'prisma/zod-models/user.entity'
+import { ReviewService } from 'src/review/review.service'
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { SafeOmit } from './utils/types'
-import { stripPassword } from './utils/stripPassword'
-
 import { prismaClient } from '../../prisma/script'
-import { ReviewService } from 'src/review/review.service'
+import { CreateUserDto } from './dto/create-user.dto'
 import {
   findOneUserResponseDto,
   FindOneUserResponseDto,
 } from './dto/find-one-response.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { stripPassword } from './utils/stripPassword'
 
 @Injectable()
 export class UserService {
