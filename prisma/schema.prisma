@@ -20,8 +20,7 @@ model User {
   name    String
   surname String
 
-  reviews Review[] @relation("reviewee") // reviews written to this user
-  r       Review[] @relation("reviewer") // ignore this
+  reviews Review[] @relation("reviewer") // reviews written by this user to other users
 }
 
 model Review {
@@ -29,11 +28,12 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  content String
-  stars   Int
+  content    String
+  stars      Int
+  revieweeId String // the user being reviewed
 
-  revieweeId String
-  reviewee   User   @relation(fields: [revieweeId], references: [id], onDelete: Cascade, name: "reviewee")
   reviewerId String
   reviewer   User   @relation(fields: [reviewerId], references: [id], onDelete: SetNull, name: "reviewer")
+
+  @@index([revieweeId], name: "revieweeId")
 }
