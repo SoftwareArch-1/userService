@@ -17,8 +17,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name    String
-  surname String
+  name        String
+  surname     String
+  description String?
+  birthDate   DateTime?
 
   reviews Review[] @relation("reviewer") // reviews written by this user to other users
 }
