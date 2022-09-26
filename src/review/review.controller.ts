@@ -22,10 +22,14 @@ export class ReviewController {
     schema: { ...zodToOpenAPI(createReviewResponseDtoSchema), example: '👌' },
     status: HttpStatus.CREATED,
   })
-  create(@Body() body: CreateReviewDto): Promise<CreateReviewResponseDto> {
-    return this.reviewService.create({
-      ...body,
-      reviewerId: '' /* req.user?.id */,
-    })
+  async create(
+    @Body() body: CreateReviewDto,
+  ): Promise<CreateReviewResponseDto> {
+    return createReviewResponseDtoSchema.parse(
+      await this.reviewService.create({
+        ...body,
+        reviewerId: '' /* req.user?.id */,
+      }),
+    )
   }
 }

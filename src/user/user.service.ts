@@ -72,11 +72,11 @@ export class UserService {
 
     const stars = this.reviewService.countReviewStars(reviews)
 
-    return findOneUserResponseDto.parse({
+    return {
       reviews,
       stars,
       profile: user,
-    })
+    }
   }
 
   update(id: string, { password, ...rest }: UpdateUserDto) {

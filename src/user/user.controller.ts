@@ -47,8 +47,8 @@ export class UserController {
   @ApiResponse({
     schema: zodToOpenAPI(findOneUserResponseDto),
   })
-  findOne(@Param('id') id: string): Promise<FindOneUserResponseDto> {
-    return this.userService.findOne(id)
+  async findOne(@Param('id') id: string): Promise<FindOneUserResponseDto> {
+    return findOneUserResponseDto.parse(await this.userService.findOne(id))
   }
 
   @Patch(':id')
