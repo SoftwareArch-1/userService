@@ -12,13 +12,17 @@ import { prismaClient } from '../../prisma/script'
 @Injectable()
 export class UserService {
   async create({ password, ...rest }: CreateUserDto) {
-    const createdUser = await prismaClient.user.create({
-      data: {
-        password: bcrypt.hashSync(password, 10),
-        ...rest,
-      },
-    })
-    return stripPassword(createdUser)
+    try {
+      const createdUser = await prismaClient.user.create({
+        data: {
+          password: bcrypt.hashSync(password, 10),
+          ...rest,
+        },
+      })
+      return stripPassword(createdUser)
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 
   async findAll() {
@@ -34,7 +38,7 @@ export class UserService {
       },
     })
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found.', HttpStatus.NOT_FOUND)
     }
     return stripPassword(user)
   }
@@ -46,7 +50,7 @@ export class UserService {
       },
     })
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found.', HttpStatus.NOT_FOUND)
     }
 
     if (password) {
@@ -70,11 +74,15 @@ export class UserService {
   }
 
   remove(id: string) {
-    const deleteUsers = prismaClient.user.deleteMany({
-      where: {
-        id: id,
-      },
-    })
-    return deleteUsers
+    try {
+      const deleteUsers = prismaClient.user.deleteMany({
+        where: {
+          id: id,
+        },
+      })
+      return deleteUsers
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 }
