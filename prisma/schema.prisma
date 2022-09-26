@@ -31,6 +31,7 @@ model Review {
   content String
   stars   Int
 
-  authorId String
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade, name: "reviews")
+  revieweeId String
+  reviewee   User   @relation(fields: [revieweeId], references: [id], onDelete: Cascade, name: "reviews")
+  reviewerId String
 }
