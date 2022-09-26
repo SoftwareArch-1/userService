@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common'
 import { prismaClient } from 'prisma/script'
+
+import { Injectable } from '@nestjs/common'
+
 import { CreateReviewDto } from './dto/createReview.dto'
+import { CreateReviewResponseDto } from './dto/createReviewResponse.dto'
 
 @Injectable()
 export class ReviewService {
@@ -11,7 +14,7 @@ export class ReviewService {
     reviewerId,
   }: CreateReviewDto & {
     reviewerId: string // from request object
-  }) {
+  }): Promise<CreateReviewResponseDto> {
     await prismaClient.user.update({
       where: {
         id: reviewerId,

@@ -1,7 +1,14 @@
-import { Body, Controller, Post, Req } from '@nestjs/common'
-import { Request } from 'express'
-import { UseZodGuard } from 'nestjs-zod'
+import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
+
+import { Body, Controller, HttpStatus, Post, Req } from '@nestjs/common'
+import { HttpCode } from '@nestjs/common/decorators/http/http-code.decorator'
+import { ApiResponse } from '@nestjs/swagger'
+
 import { CreateReviewDto } from './dto/createReview.dto'
+import {
+  CreateReviewResponseDto,
+  createReviewResponseDtoSchema,
+} from './dto/createReviewResponse.dto'
 import { ReviewService } from './review.service'
 
 @Controller('review')
@@ -10,7 +17,12 @@ export class ReviewController {
 
   @Post()
   @UseZodGuard('body', CreateReviewDto)
-  create(@Req() req: Request, @Body() body: CreateReviewDto) {
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({
+    schema: { ...zodToOpenAPI(createReviewResponseDtoSchema), example: '👌' },
+    status: HttpStatus.CREATED,
+  })
+  create(@Body() body: CreateReviewDto): Promise<CreateReviewResponseDto> {
     return this.reviewService.create({
       ...body,
       reviewerId: '' /* req.user?.id */,
