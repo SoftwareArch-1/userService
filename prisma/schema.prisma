@@ -23,7 +23,7 @@ model User {
   description String?
   birthDate   DateTime?
 
-  reviews Review[] @relation("reviewer") // reviews written by this user to other users
+  reviews Review[] @relation("reviewer") // reviews written by this user to other user
 }
 
 model Review {
