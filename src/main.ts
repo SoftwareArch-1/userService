@@ -1,10 +1,12 @@
+import * as cookieParser from 'cookie-parser'
 import { patchNestJsSwagger } from 'nestjs-zod'
 
 import { NestFactory } from '@nestjs/core'
+import { MicroserviceOptions } from '@nestjs/microservices'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 import { AppModule } from './app.module'
-import * as cookieParser from 'cookie-parser'
+import { grpcClientOptions } from './grpc-client.options'
 
 patchNestJsSwagger()
 
@@ -21,6 +23,11 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document)
 
   app.use(cookieParser())
+
+  // connect to microservices
+  app.connectMicroservice<MicroserviceOptions>(grpcClientOptions)
+
+  await app.startAllMicroservices()
   await app.listen(4000)
   console.log(`Application is running on: ${await app.getUrl()}`)
 }
