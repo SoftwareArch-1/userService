@@ -54,9 +54,11 @@ export class ActivityController implements OnModuleInit {
 
   @Get(':id')
   @ApiResponse({
-    schema: zodToOpenAPI(
-      ActivityModel.or(findOneByJoinedUser).or(findOneByOutsider),
-    ),
+    schema: {
+      oneOf: [ActivityModel, findOneByJoinedUser, findOneByOutsider].map(
+        zodToOpenAPI,
+      ),
+    },
   })
   findOne(@Param('id') id: string) {
     return this.activityService.findOne({ id }).pipe(
