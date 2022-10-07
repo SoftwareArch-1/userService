@@ -14,6 +14,7 @@ import { ClientGrpc } from '@nestjs/microservices'
 import { ApiResponse } from '@nestjs/swagger'
 
 import { ActivityService, CreateActivity } from './activity.proto.interface'
+import { eachInAll, findAllActivityDto } from './dto/finAll.dto'
 import { findOneByJoinedUser, findOneByOutsider } from './dto/findOne.dto'
 import { ActivityModel } from './zod'
 
@@ -41,11 +42,14 @@ export class ActivityController implements OnModuleInit {
 
   @Get()
   @ApiResponse({
-    schema: zodToOpenAPI(ActivityModel.array()),
+    schema: zodToOpenAPI(findAllActivityDto),
   })
   findAll() {
     const stream = this.activityService.findMany({})
-    return stream.pipe(toArray())
+    return stream.pipe(
+      map((a) => eachInAll.parse(a)),
+      toArray(),
+    )
   }
 
   @Get(':id')
