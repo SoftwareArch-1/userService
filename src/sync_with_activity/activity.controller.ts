@@ -2,7 +2,14 @@ import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
 import { toArray } from 'rxjs/operators'
 
 import { OnModuleInit } from '@nestjs/common'
-import { Controller, Get, Inject, Post } from '@nestjs/common/decorators'
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+} from '@nestjs/common/decorators'
 import { ClientGrpc } from '@nestjs/microservices'
 import { ApiResponse } from '@nestjs/swagger'
 
@@ -27,7 +34,7 @@ export class ActivityController implements OnModuleInit {
     schema: zodToOpenAPI(ActivityModel),
   })
   @UseZodGuard('body', CreateActivity)
-  create(data: CreateActivity) {
+  create(@Body() data: CreateActivity) {
     return this.activityService.create(data)
   }
 
@@ -44,7 +51,7 @@ export class ActivityController implements OnModuleInit {
   @ApiResponse({
     schema: zodToOpenAPI(ActivityModel),
   })
-  findOne(id: string) {
+  findOne(@Param('id') id: string) {
     return this.activityService.findOne({ id })
   }
 }
