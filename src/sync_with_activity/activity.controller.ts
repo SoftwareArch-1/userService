@@ -15,8 +15,16 @@ import { ApiResponse } from '@nestjs/swagger'
 
 import { ActivityService, CreateActivity } from './activity.proto.interface'
 import { eachInAll, findAllActivityDto } from './dto/finAll.dto'
-import { findOneByJoinedUser, findOneByOutsider } from './dto/findOne.dto'
+import {
+  FindOneByNotOwner,
+  findOneByNotOwner,
+  FindOneByOwner,
+  findOneByOwner,
+} from './dto/findOne.dto'
 import { ActivityModel } from './zod'
+import { prismaClient } from 'prisma/script'
+import { ActivityUser } from './activity-user'
+import { User } from '@prisma/client'
 
 @Controller('activity')
 export class ActivityController implements OnModuleInit {
@@ -55,22 +63,67 @@ export class ActivityController implements OnModuleInit {
   @Get(':id')
   @ApiResponse({
     schema: {
-      oneOf: [ActivityModel, findOneByJoinedUser, findOneByOutsider].map(
-        zodToOpenAPI,
-      ),
+      oneOf: [findOneByOwner, findOneByNotOwner].map(zodToOpenAPI),
     },
   })
   findOne(@Param('id') id: string) {
+    const makeActivityUser = ({
+      name,
+      surname,
+      ...rest
+    }: User): ActivityUser => ({
+      name: `${name} ${surname}`,
+      ...rest,
+    })
+    const findUsers = (ids: string[]) =>
+      prismaClient.user.findMany({
+        where: {
+          id: {
+            in: ids,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          surname: true,
+          lineId: true,
+          discordId: true,
+          description: true,
+        },
+      })
+
     return this.activityService.findOne({ id }).pipe(
-      map((act) => {
+      map(async ({ joinedUserIds, ownerId, pendingUserIds, ...rest }) => {
+        const users = await findUsers([ownerId, ...joinedUserIds])
+
+        const activityUsers = users.map(makeActivityUser)
+        const owner = activityUsers.slice(0, 1)[0]
+        const joinedUsers = activityUsers.slice(1)
+
         const userId = 'userIdRequest' // TODO: get user id from req
-        if (act.ownerId === userId) {
-          return act
+
+        if (ownerId === userId) {
+          const dto: FindOneByOwner = {
+            joinedUsers,
+            ownerId,
+            pendingUsers: (await findUsers(pendingUserIds)).map(
+              makeActivityUser,
+            ),
+            ownerName: owner.name,
+            isOwner: true,
+            ...rest,
+          }
+          return dto
         }
-        if (act.joinedUserIds.includes(userId)) {
-          return findOneByJoinedUser.parse(act)
+
+        const dto: FindOneByNotOwner = {
+          joinedUsers,
+          ownerId,
+          ownerName: owner.name,
+          isOwner: false,
+          ...rest,
         }
-        return findOneByOutsider.parse(act)
+        return dto
       }),
     )
   }
