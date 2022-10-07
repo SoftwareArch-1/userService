@@ -1,5 +1,5 @@
 import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
-import { toArray } from 'rxjs/operators'
+import { map, toArray } from 'rxjs/operators'
 
 import { OnModuleInit } from '@nestjs/common'
 import {
@@ -14,6 +14,7 @@ import { ClientGrpc } from '@nestjs/microservices'
 import { ApiResponse } from '@nestjs/swagger'
 
 import { ActivityService, CreateActivity } from './activity.proto.interface'
+import { findOneByJoinedUser, findOneByOutsider } from './dto/findOne.dto'
 import { ActivityModel } from './zod'
 
 @Controller('activity')
@@ -49,9 +50,47 @@ export class ActivityController implements OnModuleInit {
 
   @Get(':id')
   @ApiResponse({
-    schema: zodToOpenAPI(ActivityModel),
+    schema: zodToOpenAPI(
+      ActivityModel.or(findOneByJoinedUser).or(findOneByOutsider),
+    ),
   })
   findOne(@Param('id') id: string) {
-    return this.activityService.findOne({ id })
+    return this.activityService.findOne({ id }).pipe(
+      map((act) => {
+        const userId = 'userIdRequest' // TODO: get user id from req
+        if (act.ownerId === userId) {
+          return act
+        }
+        const {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          pendingUserIds, // only owner can see pending users
+
+          joinedUserIds, // joined or owner can see this
+          ...rest
+        } = act
+
+        if (act.joinedUserIds.includes(userId)) {
+          const dto = {
+            joinedUserIds,
+            ...rest,
+          }
+          const result = findOneByJoinedUser.safeParse(dto)
+          if (!result.success) {
+            console.error(
+              'Invalid find one activity by joined users\n',
+              result.error,
+            )
+          }
+          return dto
+        }
+
+        const result = findOneByOutsider.safeParse(rest)
+        if (!result.success) {
+          console.error('Invalid find one activity by outsider\n', result.error)
+        }
+        // outsiders see this
+        return rest
+      }),
+    )
   }
 }
