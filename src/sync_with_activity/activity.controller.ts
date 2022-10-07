@@ -67,35 +67,10 @@ export class ActivityController implements OnModuleInit {
         if (act.ownerId === userId) {
           return act
         }
-        const {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          pendingUserIds, // only owner can see pending users
-
-          joinedUserIds, // joined or owner can see this
-          ...rest
-        } = act
-
         if (act.joinedUserIds.includes(userId)) {
-          const dto = {
-            joinedUserIds,
-            ...rest,
-          }
-          const result = findOneByJoinedUser.safeParse(dto)
-          if (!result.success) {
-            console.error(
-              'Invalid find one activity by joined users\n',
-              result.error,
-            )
-          }
-          return dto
+          return findOneByJoinedUser.parse(act)
         }
-
-        const result = findOneByOutsider.safeParse(rest)
-        if (!result.success) {
-          console.error('Invalid find one activity by outsider\n', result.error)
-        }
-        // outsiders see this
-        return rest
+        return findOneByOutsider.parse(act)
       }),
     )
   }
