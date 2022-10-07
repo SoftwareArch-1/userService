@@ -24,10 +24,6 @@ async function bootstrap() {
 
   app.use(cookieParser())
 
-  // connect to microservices
-  app.connectMicroservice<MicroserviceOptions>(grpcClientOptions)
-
-  await app.startAllMicroservices()
   await app.listen(4000)
   console.log(`Application is running on: ${await app.getUrl()}`)
 }
