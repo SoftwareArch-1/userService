@@ -12,7 +12,7 @@ import {
   Post,
 } from '@nestjs/common/decorators'
 import { ClientGrpc } from '@nestjs/microservices'
-import { ApiResponse } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { User } from '@prisma/client'
 
 import { ActivityUser } from './activity-user'
@@ -27,6 +27,7 @@ import {
 import { ActivityModel } from './zod'
 
 @Controller('activity')
+@ApiTags('activity')
 export class ActivityController implements OnModuleInit {
   constructor(
     @Inject('ACTIVITY_PACKAGE') private readonly client: ClientGrpc,
