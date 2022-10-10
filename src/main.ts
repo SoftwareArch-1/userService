@@ -12,9 +12,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   const config = new DocumentBuilder()
-    .setTitle('User service')
-    .setDescription('The user service API description')
-    .setVersion('1.0')
+    .setTitle('🤩🤩 User service + API gateway 😎👌')
+    .setDescription('The user service API and gateway description')
+    .setVersion('69,420 🤪')
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
