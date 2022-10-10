@@ -21,7 +21,10 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document)
 
   app.use(cookieParser())
-  app.enableCors()
+  app.enableCors({
+    credentials: true,
+    origin: true,
+  })
 
   await app.listen(4000)
   console.log(`Application is running on: ${await app.getUrl()}`)
