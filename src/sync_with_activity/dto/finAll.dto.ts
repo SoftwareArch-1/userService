@@ -4,4 +4,4 @@ export const eachInAll = ActivityModel.omit({
   pendingUserIds: true,
 })
 
-export const findAllActivityDto = ActivityModel.array()
+export const findAllActivityDto = eachInAll.array()
