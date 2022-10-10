@@ -15,7 +15,6 @@ async function bootstrap() {
     .setTitle('User service')
     .setDescription('The user service API description')
     .setVersion('1.0')
-    .addTag('users')
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
