@@ -63,7 +63,6 @@ export class ActivityController implements OnModuleInit {
         return {
           ...data,
           joinedUserIds: data.joinedUserIds ?? [],
-          pendingUserIds: data.pendingUserIds ?? [],
         }
       }),
       toArray(),
