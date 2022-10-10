@@ -21,7 +21,7 @@ export const createActivitySchema = z.object({
   description: z.string().min(1),
   ownerId: z.string().cuid(),
   targetDate: z.string(),
-  maxParticipants: z.number(),
+  maxParticipants: z.number().int().min(1),
   requireLine: z.boolean(),
   requireDiscord: z.boolean(),
   tag: z.string(),
