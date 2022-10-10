@@ -38,10 +38,10 @@ export class UserController {
     )
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.userService.findAll()
-  // }
+  @Get()
+  findAll() {
+    return this.userService.findAll()
+  }
 
   @Get(':id')
   @ApiResponse({
