@@ -10,7 +10,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common'
-import { ApiResponse } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { CreateUserDto } from './dto/create-user.dto'
 import {
@@ -22,6 +22,7 @@ import { UserService } from './user.service'
 import { HttpStatus } from '@nestjs/common/enums'
 
 @Controller('user')
+@ApiTags('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
