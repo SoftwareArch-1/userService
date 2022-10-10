@@ -1,5 +1,4 @@
 import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
-import { z } from 'nestjs-zod/z'
 import { prismaClient } from 'prisma/script'
 import { map, toArray } from 'rxjs/operators'
 
@@ -18,7 +17,7 @@ import { User } from '@prisma/client'
 
 import { ActivityUser } from './activity-user'
 import { ActivityService, CreateActivity } from './activity.proto.interface'
-import { actualEachInAll, findAllActivityDto } from './dto/finAll.dto'
+import { eachInAll, findAllActivityDto } from './dto/finAll.dto'
 import {
   FindOneByNotOwner,
   findOneByNotOwner,
@@ -26,8 +25,6 @@ import {
   findOneByOwner,
 } from './dto/findOne.dto'
 import { ActivityModel } from './zod'
-
-import type { Observable } from 'rxjs'
 
 @Controller('activity')
 export class ActivityController implements OnModuleInit {
@@ -55,16 +52,10 @@ export class ActivityController implements OnModuleInit {
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findAll(): Observable<z.infer<typeof findAllActivityDto>> {
+  findAll() {
     const stream = this.activityService.findMany({})
     return stream.pipe(
-      map((a) => {
-        const data = actualEachInAll.parse(a)
-        return {
-          ...data,
-          joinedUserIds: data.joinedUserIds ?? [],
-        }
-      }),
+      map((a) => eachInAll.parse(a)),
       toArray(),
     )
   }
@@ -102,6 +93,7 @@ export class ActivityController implements OnModuleInit {
       })
 
     return this.activityService.findOne({ id }).pipe(
+      map((data) => ActivityModel.parse(data)),
       map(async ({ joinedUserIds, ownerId, pendingUserIds, ...rest }) => {
         const users = await findUsers([ownerId, ...joinedUserIds])
 
