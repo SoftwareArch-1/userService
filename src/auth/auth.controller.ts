@@ -14,14 +14,28 @@ import { AuthService } from './auth.service'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { LocalAuthGuard } from './guards/local-auth.guard'
 import { Request, Response } from 'express'
+import { createZodDto, UseZodGuard } from 'nestjs-zod'
+import { z } from 'nestjs-zod/z'
+
+class LoginDto extends createZodDto(
+  z.object({
+    email: z.string().email(),
+    password: z.string(),
+  }),
+) {}
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
+  @UseZodGuard('body', LoginDto)
   @Post('login')
-  async login(@Req() req) {
+  async login(
+    @Req() req,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Body() _: LoginDto /* required to show in swagger */,
+  ) {
     return this.authService.login(req.user)
   }
 
