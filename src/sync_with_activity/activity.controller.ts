@@ -32,6 +32,7 @@ import {
 import { ActivityModel } from './zod'
 import { HttpException } from '@nestjs/common/exceptions'
 import { HttpStatus } from '@nestjs/common/enums'
+import { acceptJoinResDtoSchema } from './dto/acceptJoinRes.dto'
 
 @Controller('activity')
 @ApiTags('activity')
@@ -62,13 +63,16 @@ export class ActivityController implements OnModuleInit {
   }
 
   @Post('accept-join')
-  @ApiResponse({})
+  @ApiResponse({
+    schema: zodToOpenAPI(acceptJoinResDtoSchema),
+  })
   @UseZodGuard('body', AcceptJoin)
   acceptJoin(@Body() data: AcceptJoin) {
     return this.activityService.acceptJoin(data).pipe(
       catchError((e) => {
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
       }),
+      map((d) => acceptJoinResDtoSchema.parse(d)),
     )
   }
 
