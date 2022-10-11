@@ -105,7 +105,11 @@ export class ActivityController implements OnModuleInit {
   })
   @UseZodGuard('body', CreateActivity)
   create(@Body() data: CreateActivity) {
-    return this.activityService.create(data)
+    return this.activityService.create(data).pipe(
+      catchError((e) => {
+        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+      }),
+    )
   }
 
   @Get()
