@@ -37,9 +37,9 @@ export class UserController {
   })
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUserDto: CreateUserDto) {
-    return strippedPasswordUserSchema.parse(
-      await this.userService.create(createUserDto),
-    )
+    const createdUserWithToken = this.userService.create(createUserDto)
+
+    return createdUserWithToken
   }
 
   @Get('all')

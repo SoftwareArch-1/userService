@@ -7,8 +7,8 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
     "surname" TEXT NOT NULL,
+    "birthDate" TIMESTAMP(3) NOT NULL,
     "description" TEXT,
-    "birthDate" TIMESTAMP(3),
     "lineId" TEXT,
     "discordId" TEXT,
 

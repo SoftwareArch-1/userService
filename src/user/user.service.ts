@@ -1,29 +1,40 @@
 import * as bcrypt from 'bcrypt'
 import { ReviewService } from 'src/review/review.service'
 
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 
 import { prismaClient } from '../../prisma/script'
 import { CreateUserDto } from './dto/create-user.dto'
-import {
-  FindOneUserResponseDto,
-} from './dto/find-one-response.dto'
+import { FindOneUserResponseDto } from './dto/find-one-response.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { stripPassword } from './utils/stripPassword'
+import { AuthService } from 'src/auth/auth.service'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly reviewService: ReviewService) {}
+  constructor(
+    private readonly reviewService: ReviewService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
 
-  async create({ password, ...rest }: CreateUserDto) {
+  async create({ email, password, ...rest }: CreateUserDto) {
     try {
       const createdUser = await prismaClient.user.create({
         data: {
+          email,
           password: bcrypt.hashSync(password, 10),
           ...rest,
         },
       })
-      return stripPassword(createdUser)
+      return this.authService.login({ email: createdUser.email, password })
+      // return stripPassword(createdUser)
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
     }
