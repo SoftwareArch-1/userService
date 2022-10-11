@@ -46,6 +46,17 @@ export class ActivityController implements OnModuleInit {
       this.client.getService<ActivityService>('ActivityService')
   }
 
+  @Get('find-owned-activities/:ownerId')
+  findOwnedActivities(@Param('ownerId') ownerId: string) {
+    return this.activityService.findOwnedActivities({ ownerId }).pipe(
+      catchError((e) => {
+        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+      }),
+      map((data) => eachInAll.parse(data)),
+      toArray(),
+    )
+  }
+
   @Post('join')
   @UseZodGuard('body', JoinActivity)
   join(@Body() data: JoinActivity) {
