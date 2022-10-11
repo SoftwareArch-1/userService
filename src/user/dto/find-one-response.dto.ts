@@ -5,13 +5,19 @@ export const findOneUserResponseDto = z.object({
     name: z.string(),
     surname: z.string(),
     email: z.string().email(),
-    id: z.string().cuid(),
+    id: z.string(),
+    description: z.string().nullish(),
+    discordId: z.string().nullish(),
+    lineId: z.string().nullish(),
   }),
   reviews: z.array(
     z.object({
       content: z.string(),
       id: z.string().cuid(),
       stars: z.number().int().min(1).max(5),
+      createdAt: z.preprocess((arg) => {
+        if (typeof arg == 'string' || arg instanceof Date) return new Date(arg)
+      }, z.date()),
       reviewer: z.object({
         name: z.string(),
         surname: z.string(),

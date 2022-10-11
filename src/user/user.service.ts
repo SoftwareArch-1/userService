@@ -46,6 +46,9 @@ export class UserService {
         surname: true,
         email: true,
         id: true,
+        discordId: true,
+        lineId: true,
+        description: true,
       },
     })
 
@@ -61,6 +64,7 @@ export class UserService {
         id: true,
         content: true,
         stars: true,
+        createdAt: true,
         reviewer: {
           select: {
             name: true,
