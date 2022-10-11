@@ -7,6 +7,7 @@ export interface ActivityService {
   create: (data: CreateActivity) => Observable<Activity>
   findOne: (data: ActivityById) => Observable<Activity>
   findMany(data: FindManyParams): Observable<Activity>
+  join: (data: JoinActivity) => Observable<Activity>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -27,6 +28,13 @@ export const createActivitySchema = z.object({
   tag: z.string(),
   location: z.string().nullish(),
 })
+
+export const joinActivitySchema = z.object({
+  activityId: z.string().cuid(),
+  joinerId: z.string().cuid(),
+})
+
+export class JoinActivity extends createZodDto(joinActivitySchema) {}
 
 export class CreateActivity extends createZodDto(createActivitySchema) {}
 

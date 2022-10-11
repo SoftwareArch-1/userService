@@ -1,6 +1,6 @@
 import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
 import { prismaClient } from 'prisma/script'
-import { map, toArray } from 'rxjs/operators'
+import { catchError, map, toArray } from 'rxjs/operators'
 
 import { OnModuleInit } from '@nestjs/common'
 import {
@@ -16,7 +16,11 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { User } from '@prisma/client'
 
 import { ActivityUser } from './activity-user'
-import { ActivityService, CreateActivity } from './activity.proto.interface'
+import {
+  ActivityService,
+  CreateActivity,
+  JoinActivity,
+} from './activity.proto.interface'
 import { eachInAll, findAllActivityDto } from './dto/finAll.dto'
 import {
   FindOneByNotOwner,
@@ -25,6 +29,8 @@ import {
   findOneByOwner,
 } from './dto/findOne.dto'
 import { ActivityModel } from './zod'
+import { HttpException } from '@nestjs/common/exceptions'
+import { HttpStatus } from '@nestjs/common/enums'
 
 @Controller('activity')
 @ApiTags('activity')
@@ -38,6 +44,17 @@ export class ActivityController implements OnModuleInit {
   onModuleInit() {
     this.activityService =
       this.client.getService<ActivityService>('ActivityService')
+  }
+
+  @Post('join')
+  @UseZodGuard('body', JoinActivity)
+  join(@Body() data: JoinActivity) {
+    return this.activityService.join(data).pipe(
+      catchError((e) => {
+        // failed to join since maximum participants reached?
+        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+      }),
+    )
   }
 
   @Post()
