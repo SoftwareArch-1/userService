@@ -11,6 +11,8 @@ import {
   Param,
   Post,
 } from '@nestjs/common/decorators'
+import { HttpStatus } from '@nestjs/common/enums'
+import { HttpException } from '@nestjs/common/exceptions'
 import { ClientGrpc } from '@nestjs/microservices'
 import { ApiHeader, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { User } from '@prisma/client'
@@ -20,8 +22,11 @@ import {
   AcceptJoin,
   ActivityService,
   CreateActivity,
+  DeclineJoin,
   JoinActivity,
 } from './activity.proto.interface'
+import { acceptJoinResDtoSchema } from './dto/acceptJoinRes.dto'
+import { declineJoinResDtoSchema } from './dto/declineJoinRes.dto'
 import { eachInAll, findAllActivityDto } from './dto/finAll.dto'
 import {
   FindOneByNotOwner,
@@ -30,9 +35,6 @@ import {
   findOneByOwner,
 } from './dto/findOne.dto'
 import { ActivityModel } from './zod'
-import { HttpException } from '@nestjs/common/exceptions'
-import { HttpStatus } from '@nestjs/common/enums'
-import { acceptJoinResDtoSchema } from './dto/acceptJoinRes.dto'
 
 @Controller('activity')
 @ApiTags('activity')
@@ -87,6 +89,20 @@ export class ActivityController implements OnModuleInit {
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
       }),
       map((d) => acceptJoinResDtoSchema.parse(d)),
+    )
+  }
+
+  @Post('decline-join')
+  @ApiResponse({
+    schema: zodToOpenAPI(declineJoinResDtoSchema),
+  })
+  @UseZodGuard('body', DeclineJoin)
+  declineJoin(@Body() data: DeclineJoin) {
+    return this.activityService.declineJoin(data).pipe(
+      catchError((e) => {
+        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+      }),
+      map((d) => declineJoinResDtoSchema.parse(d)),
     )
   }
 

@@ -11,12 +11,18 @@ export interface ActivityService {
   findOwnedActivities: (data: FindOwnedActivities) => Observable<Activity>
   findJoinedActivities: (data: FindJoinedActivities) => Observable<Activity>
   acceptJoin: (data: AcceptJoin) => Observable<Activity>
+  declineJoin: (data: DeclineJoin) => Observable<Activity>
 }
+
 
 export const acceptJoinSchema = z.object({
   activityId: z.string(),
   joinerId: z.string(),
 })
+
+export const declineJoin = acceptJoinSchema
+
+export class DeclineJoin extends createZodDto(declineJoin) {}
 
 export class AcceptJoin extends createZodDto(acceptJoinSchema) {}
 
