@@ -6,9 +6,8 @@ import { createUserDtoSchema } from './create-user.dto'
 export const updateUserDtoSchema = createUserDtoSchema
   .extend({
     description: z.string().nullable(),
-    birthDate: z.preprocess((arg) => {
-      if (typeof arg == 'string' || arg instanceof Date) return new Date(arg)
-    }, z.date()),
+    discordId: z.string().nullable(),
+    lineId: z.string().nullable(),
   })
   .strict()
   .partial()
