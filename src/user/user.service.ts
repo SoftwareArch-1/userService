@@ -79,6 +79,23 @@ export class UserService {
     }
   }
 
+  async findMe(email: string) {
+    const user = await prismaClient.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!user) {
+      throw new HttpException('User not found', 404)
+    }
+
+    return await this.findOne(user.id)
+  }
+
   async findOneByEmail(email: string) {
     const user = await prismaClient.user.findUnique({
       where: {
