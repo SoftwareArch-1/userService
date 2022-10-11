@@ -1,5 +1,4 @@
 import * as bcrypt from 'bcrypt'
-import { userSchema } from 'prisma/zod-models/user.entity'
 import { ReviewService } from 'src/review/review.service'
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
@@ -7,7 +6,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { prismaClient } from '../../prisma/script'
 import { CreateUserDto } from './dto/create-user.dto'
 import {
-  findOneUserResponseDto,
   FindOneUserResponseDto,
 } from './dto/find-one-response.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
@@ -49,6 +47,7 @@ export class UserService {
         discordId: true,
         lineId: true,
         description: true,
+        birthDate: true,
       },
     })
 
@@ -79,7 +78,7 @@ export class UserService {
     return {
       reviews,
       stars,
-      profile: user,
+      profile: { ...user, birthDate: new Date(user.birthDate) },
     }
   }
 

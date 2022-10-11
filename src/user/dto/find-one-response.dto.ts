@@ -9,6 +9,9 @@ export const findOneUserResponseDto = z.object({
     description: z.string().nullish(),
     discordId: z.string().nullish(),
     lineId: z.string().nullish(),
+    birthDate: z.preprocess((arg) => {
+      if (typeof arg == 'string' || arg instanceof Date) return new Date(arg)
+    }, z.date()),
   }),
   reviews: z.array(
     z.object({

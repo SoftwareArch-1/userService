@@ -20,8 +20,8 @@ model User {
 
   name        String
   surname     String
+  birthDate   DateTime
   description String?
-  birthDate   DateTime?
   lineId      String?
   discordId   String?
 

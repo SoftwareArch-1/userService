@@ -6,6 +6,9 @@ export const createUserDtoSchema = z.object({
   surname: z.string().min(3),
   email: z.string().email(),
   password: z.string().min(6),
+  birthDate: z.preprocess((arg) => {
+    if (typeof arg == 'string' || arg instanceof Date) return new Date(arg)
+  }, z.date()),
 })
 
 export class CreateUserDto extends createZodDto(createUserDtoSchema) {}

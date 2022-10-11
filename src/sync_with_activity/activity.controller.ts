@@ -216,10 +216,10 @@ export class ActivityController implements OnModuleInit {
         }
 
         const status: keyof typeof ActivityStatus = joinedUserIds.includes(
-          req.user.id,
+          'req.user.id', // FIXME: get user id from req
         )
           ? 'joined'
-          : pendingUserIds.includes(req.user.id)
+          : pendingUserIds.includes('req.user.id') // FIXME
           ? 'pending'
           : 'not-joined'
 
