@@ -48,7 +48,7 @@ export class ActivityController implements OnModuleInit {
       this.client.getService<ActivityService>('ActivityService')
   }
 
-  @Get('find-owned-activities/:ownerId')
+  @Get('owned/:ownerId')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
