@@ -22,6 +22,8 @@ model User {
   surname     String
   description String?
   birthDate   DateTime?
+  lineId      String?
+  discordId   String?
 
   reviews Review[] @relation("reviewer") // reviews written by this user to other user
 }

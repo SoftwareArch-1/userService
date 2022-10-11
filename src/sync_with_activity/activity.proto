@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package sync_with_activity;
+
+service ActivityService {
+  rpc Create (CreateActivity) returns (Activity);
+  rpc FindOne (ActivityById) returns (Activity);
+  rpc FindMany (FindManyParams) returns (stream Activity);
+  rpc Join (JoinActivity) returns (Activity);
+  rpc AcceptJoin (AcceptJoin) returns (Activity);
+  rpc FindOwnedActivities (FindOwnedActivities) returns (stream Activity);
+}
+
+message AcceptJoin {
+  string activityId = 1;
+  string joinerId = 2;
+}
+
+message FindOwnedActivities {
+  string ownerId = 1;
+}
+
+message JoinActivity {
+  string activityId = 1;
+  string joinerId = 2;
+}
+
+message FindManyParams {}
+
+message ActivityById {
+  string id = 1;
+}
+
+message CreateActivity {
+  string name = 1;
+  string description = 2;
+  string ownerId = 3;
+  string targetDate = 4;
+  int32 maxParticipants = 5;
+  bool requireLine = 6;
+  bool requireDiscord = 7;
+  string tag = 8;
+  optional string location = 9;
+}
+
+message Activity {
+  string id = 1;
+
+  // the same with `CreateActivity` message
+  string name = 2;
+  string description = 3;
+  string ownerId = 4;
+  string targetDate = 5;
+  int32 maxParticipants = 6;
+  bool requireLine = 7;
+  bool requireDiscord = 8;
+  string tag = 9;
+  optional string location = 10;
+
+  repeated string joinedUserIds = 11;
+  repeated string pendingUserIds = 12;
+}

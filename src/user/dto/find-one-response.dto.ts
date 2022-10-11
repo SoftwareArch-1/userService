@@ -13,7 +13,7 @@ export const findOneUserResponseDto = z.object({
   reviews: z.array(
     z.object({
       content: z.string(),
-      id: z.string().cuid(),
+      id: z.string(),
       stars: z.number().int().min(1).max(5),
       createdAt: z.preprocess((arg) => {
         if (typeof arg == 'string' || arg instanceof Date) return new Date(arg)
