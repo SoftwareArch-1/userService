@@ -5,12 +5,12 @@ export const findOneUserResponseDto = z.object({
     name: z.string(),
     surname: z.string(),
     email: z.string().email(),
-    id: z.string().cuid(),
+    id: z.string(),
   }),
   reviews: z.array(
     z.object({
       content: z.string(),
-      id: z.string().cuid(),
+      id: z.string(),
       stars: z.number().int().min(1).max(5),
       reviewer: z.object({
         name: z.string(),
