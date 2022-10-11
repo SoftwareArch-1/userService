@@ -19,7 +19,7 @@ import { z } from 'nestjs-zod/z'
 
 class LoginDto extends createZodDto(
   z.object({
-    email: z.string().email(),
+    username: z.string().email(),
     password: z.string(),
   }),
 ) {}
