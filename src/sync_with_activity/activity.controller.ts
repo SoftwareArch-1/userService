@@ -163,7 +163,7 @@ export class ActivityController implements OnModuleInit {
     )
   }
 
-  @Get(':activityId/:userId')
+  @Get(':activityId')
   @ApiResponse({
     schema: {
       oneOf: [findOneByOwner, findOneByNotOwner].map(zodToOpenAPI),
