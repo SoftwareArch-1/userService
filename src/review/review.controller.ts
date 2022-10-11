@@ -18,7 +18,7 @@ import {
 } from './dto/createReviewResponse.dto'
 import { ReviewService } from './review.service'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
-import { AuthenticatedResponse } from 'src/types'
+import { AuthenticatedRequest } from 'src/types'
 @UseGuards(JwtAuthGuard)
 @Controller('review')
 @ApiTags('review')
@@ -34,7 +34,7 @@ export class ReviewController {
   })
   async create(
     @Body() body: CreateReviewDto,
-    @Req() req: AuthenticatedResponse,
+    @Req() req: AuthenticatedRequest,
   ): Promise<CreateReviewResponseDto> {
     return createReviewResponseDtoSchema.parse(
       await this.reviewService.create({

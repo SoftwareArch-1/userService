@@ -1,6 +1,6 @@
 import { User } from '@prisma/client'
-import { Response } from 'express'
+import { Request } from 'express'
 
-export interface AuthenticatedResponse extends Response {
+export interface AuthenticatedRequest extends Request {
   user: User
 }

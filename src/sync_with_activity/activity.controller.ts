@@ -2,7 +2,7 @@ import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
 import { prismaClient } from 'prisma/script'
 import { catchError, map, toArray } from 'rxjs/operators'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
-import { AuthenticatedResponse } from 'src/types'
+import { AuthenticatedRequest } from 'src/types'
 
 import { OnModuleInit, Req } from '@nestjs/common'
 import {
@@ -58,7 +58,7 @@ export class ActivityController implements OnModuleInit {
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findJoinedActivities(@Req() req: AuthenticatedResponse) {
+  findJoinedActivities(@Req() req: AuthenticatedRequest) {
     return this.activityService
       .findJoinedActivities({ joinerId: req.user.id })
       .pipe(
@@ -74,7 +74,7 @@ export class ActivityController implements OnModuleInit {
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findOwnedActivities(@Req() req: AuthenticatedResponse) {
+  findOwnedActivities(@Req() req: AuthenticatedRequest) {
     return this.activityService
       .findOwnedActivities({ ownerId: req.user.id })
       .pipe(
@@ -142,7 +142,7 @@ export class ActivityController implements OnModuleInit {
     schema: zodToOpenAPI(ActivityModel),
   })
   @UseZodGuard('body', CreateActivity)
-  create(@Body() data: CreateActivity, @Req() req: AuthenticatedResponse) {
+  create(@Body() data: CreateActivity, @Req() req: AuthenticatedRequest) {
     return this.activityService.create({ ...data, ownerId: req.user.id }).pipe(
       catchError((e) => {
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
@@ -168,7 +168,7 @@ export class ActivityController implements OnModuleInit {
       oneOf: [findOneByOwner, findOneByNotOwner].map(zodToOpenAPI),
     },
   })
-  findOne(@Param('id') id: string, @Req() req: AuthenticatedResponse) {
+  findOne(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     const makeActivityUser = ({
       name,
       surname,
