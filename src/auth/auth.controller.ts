@@ -27,12 +27,12 @@ export class AuthController {
 
   @Post('logout')
   logout(@Req() req: Request, @Res() res: Response) {
-    this.authService.logout(req.cookies[process.env.TOKEN_NAME as string])
-    res.clearCookie(process.env.TOKEN_NAME as string, {
-      sameSite: 'none',
-      // secure: true,
-    })
-    // res.clearCookie(process.env.TOKEN_NAME);
-    res.status(HttpStatus.OK).json({ success: true })
+    // this.authService.logout(req.cookies[process.env.TOKEN_NAME as string])
+    // res.clearCookie(process.env.TOKEN_NAME as string, {
+    //   sameSite: 'none',
+    //   // secure: true,
+    // })
+    // // res.clearCookie(process.env.TOKEN_NAME);
+    // res.status(HttpStatus.OK).json({ success: true })
   }
 }
