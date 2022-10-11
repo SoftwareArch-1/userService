@@ -12,7 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { CreateUserDto } from './dto/create-user.dto'
 import {
@@ -49,6 +49,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
+  @ApiBearerAuth('JWT-auth')
   @ApiResponse({
     schema: zodToOpenAPI(findOneUserResponseDto),
   })
@@ -58,6 +59,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
+  @ApiBearerAuth('JWT-auth')
   @ApiResponse({
     schema: zodToOpenAPI(findOneUserResponseDto),
   })
