@@ -1,6 +1,13 @@
 import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
 
-import { Body, Controller, HttpStatus, Post, Req } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common'
 import { HttpCode } from '@nestjs/common/decorators/http/http-code.decorator'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 
@@ -10,7 +17,8 @@ import {
   createReviewResponseDtoSchema,
 } from './dto/createReviewResponse.dto'
 import { ReviewService } from './review.service'
-
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+@UseGuards(JwtAuthGuard)
 @Controller('review')
 @ApiTags('review')
 export class ReviewController {

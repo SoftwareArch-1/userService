@@ -83,6 +83,32 @@ export class UserService {
     }
   }
 
+  async findMe(email: string) {
+    const user = await prismaClient.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!user) {
+      throw new HttpException('User not found', 404)
+    }
+
+    return await this.findOne(user.id)
+  }
+
+  async findOneByEmail(email: string) {
+    const user = await prismaClient.user.findUnique({
+      where: {
+        email,
+      },
+    })
+    return user
+  }
+
   update(id: string, { password, ...rest }: UpdateUserDto) {
     const user = prismaClient.user.findUnique({
       where: {
@@ -92,7 +118,6 @@ export class UserService {
     if (!user) {
       throw new HttpException('User not found.', HttpStatus.NOT_FOUND)
     }
-
     if (password) {
       return prismaClient.user.update({
         where: {
@@ -115,14 +140,14 @@ export class UserService {
 
   remove(id: string) {
     try {
-      const deleteUsers = prismaClient.user.deleteMany({
+      const deleteUsers = prismaClient.user.delete({
         where: {
           id: id,
         },
       })
       return deleteUsers
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 }

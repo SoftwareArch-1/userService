@@ -1,51 +1,31 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, ConsoleLogger, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { compare } from 'bcrypt'
 import { prismaClient } from 'prisma/script'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { UserService } from '../user/user.service'
 import { SafeOmit } from '../user/utils/types'
+import * as bcrypt from 'bcrypt'
 import { Prisma } from '@prisma/client'
+import { stripPassword } from 'src/user/utils/stripPassword'
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
-  async validateUser(email: string, pass: string): Promise<any> {
-    return {
-      id: 1,
-      email: email,
-      password: pass,
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.findOneByEmail(email)
+    if (user && (await bcrypt.compare(password, user.password))) {
+      return stripPassword(user)
     }
-    // const user = await this.userService.findOne(email)
-    // //validate password
-    // if (user && user.email === pass) {
-    //   return user
-    // }
-    // return null
+    return null
   }
 
-  async login(reqUser: any) {
-    console.log(reqUser)
-    const payload = { username: reqUser.email, sub: reqUser.id }
-
-    const findUser = await prismaClient.user.findUnique({
-      where: {
-        email: reqUser.email,
-      },
-    })
-    if (!findUser) {
-      throw new BadRequestException('The username or password is incorrect!')
-    }
-    //TODO: fix this prisma type problem
-    const isPassValid = await compare(reqUser.password, findUser.password)
-
-    if (!isPassValid) {
-      throw new BadRequestException('The username or password is incorrect!')
-    }
+  async login(user: any) {
+    const payload = { email: user.email }
 
     return {
+      user: await this.userService.findMe(user.email),
       access_token: this.jwtService.sign(payload),
     }
   }
