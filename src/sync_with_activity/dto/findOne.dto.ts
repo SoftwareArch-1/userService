@@ -9,8 +9,10 @@ const base = ActivityModel.omit({
 }).extend({
   ownerName: z.string(),
   joinedUsers: activityUser.array(),
-  isOwner: z.boolean(), // tells if the request comes from the owner of the activity or not
+  status: z.enum(['pending', 'joined', 'owned', 'not-joined']),
 })
+
+export const ActivityStatus = base.shape.status.enum
 
 export const findOneByOwner = base.extend({
   pendingUsers: activityUser.array(),

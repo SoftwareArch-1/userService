@@ -31,6 +31,7 @@ import { acceptJoinResDtoSchema } from './dto/acceptJoinRes.dto'
 import { declineJoinResDtoSchema } from './dto/declineJoinRes.dto'
 import { eachInAll, findAllActivityDto } from './dto/finAll.dto'
 import {
+  ActivityStatus,
   FindOneByNotOwner,
   findOneByNotOwner,
   FindOneByOwner,
@@ -208,17 +209,25 @@ export class ActivityController implements OnModuleInit {
               makeActivityUser,
             ),
             ownerName: owner.name,
-            isOwner: true,
+            status: 'owned',
             ...rest,
           }
           return dto
         }
 
+        const status: keyof typeof ActivityStatus = joinedUserIds.includes(
+          req.user.id,
+        )
+          ? 'joined'
+          : pendingUserIds.includes(req.user.id)
+          ? 'pending'
+          : 'not-joined'
+
         const dto: FindOneByNotOwner = {
           joinedUsers,
           ownerId,
           ownerName: owner.name,
-          isOwner: false,
+          status,
           ...rest,
         }
         return dto
