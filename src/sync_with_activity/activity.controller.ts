@@ -48,6 +48,20 @@ export class ActivityController implements OnModuleInit {
       this.client.getService<ActivityService>('ActivityService')
   }
 
+  @Get('joined/:joinerId')
+  @ApiResponse({
+    schema: zodToOpenAPI(findAllActivityDto),
+  })
+  findJoinedActivities(@Param('joinerId') joinerId: string) {
+    return this.activityService.findJoinedActivities({ joinerId }).pipe(
+      catchError((e) => {
+        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+      }),
+      map((data) => eachInAll.parse(data)),
+      toArray(),
+    )
+  }
+
   @Get('owned/:ownerId')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),

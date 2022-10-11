@@ -9,6 +9,7 @@ export interface ActivityService {
   findMany(data: FindManyParams): Observable<Activity>
   join: (data: JoinActivity) => Observable<Activity>
   findOwnedActivities: (data: FindOwnedActivities) => Observable<Activity>
+  findJoinedActivities: (data: FindJoinedActivities) => Observable<Activity>
   acceptJoin: (data: AcceptJoin) => Observable<Activity>
 }
 
@@ -22,6 +23,14 @@ export class AcceptJoin extends createZodDto(acceptJoinSchema) {}
 export interface FindOwnedActivities {
   ownerId: string
 }
+
+export const findJoinedActivitiesSchema = z.object({
+  joinerId: z.string(),
+})
+
+export class FindJoinedActivities extends createZodDto(
+  findJoinedActivitiesSchema,
+) {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FindManyParams {}
