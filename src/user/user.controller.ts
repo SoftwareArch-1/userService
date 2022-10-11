@@ -9,6 +9,8 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
 
@@ -20,6 +22,7 @@ import {
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserService } from './user.service'
 import { HttpStatus } from '@nestjs/common/enums'
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 
 @Controller('user')
 export class UserController {
@@ -38,17 +41,29 @@ export class UserController {
     )
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.userService.findAll()
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiResponse({
     schema: zodToOpenAPI(findOneUserResponseDto),
   })
   async findOne(@Param('id') id: string): Promise<FindOneUserResponseDto> {
     return findOneUserResponseDto.parse(await this.userService.findOne(id))
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  @ApiResponse({
+    schema: zodToOpenAPI(findOneUserResponseDto),
+  })
+  async findMe(@Req() req): Promise<FindOneUserResponseDto> {
+    return findOneUserResponseDto.parse(
+      await this.userService.findMe(req.user.email),
+    )
   }
 
   @Patch(':id')
