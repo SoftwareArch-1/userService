@@ -2,8 +2,9 @@ import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
 import { prismaClient } from 'prisma/script'
 import { catchError, map, toArray } from 'rxjs/operators'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { AuthenticatedResponse } from 'src/types'
 
-import { OnModuleInit } from '@nestjs/common'
+import { OnModuleInit, Req } from '@nestjs/common'
 import {
   Body,
   Controller,
@@ -53,32 +54,36 @@ export class ActivityController implements OnModuleInit {
       this.client.getService<ActivityService>('ActivityService')
   }
 
-  @Get('joined/:joinerId')
+  @Get('joined')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findJoinedActivities(@Param('joinerId') joinerId: string) {
-    return this.activityService.findJoinedActivities({ joinerId }).pipe(
-      catchError((e) => {
-        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
-      }),
-      map((data) => eachInAll.parse(data)),
-      toArray(),
-    )
+  findJoinedActivities(@Req() req: AuthenticatedResponse) {
+    return this.activityService
+      .findJoinedActivities({ joinerId: req.user.id })
+      .pipe(
+        catchError((e) => {
+          throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+        }),
+        map((data) => eachInAll.parse(data)),
+        toArray(),
+      )
   }
 
-  @Get('owned/:ownerId')
+  @Get('owned')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findOwnedActivities(@Param('ownerId') ownerId: string) {
-    return this.activityService.findOwnedActivities({ ownerId }).pipe(
-      catchError((e) => {
-        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
-      }),
-      map((data) => eachInAll.parse(data)),
-      toArray(),
-    )
+  findOwnedActivities(@Req() req: AuthenticatedResponse) {
+    return this.activityService
+      .findOwnedActivities({ ownerId: req.user.id })
+      .pipe(
+        catchError((e) => {
+          throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+        }),
+        map((data) => eachInAll.parse(data)),
+        toArray(),
+      )
   }
 
   @Post('accept-join')
@@ -137,8 +142,8 @@ export class ActivityController implements OnModuleInit {
     schema: zodToOpenAPI(ActivityModel),
   })
   @UseZodGuard('body', CreateActivity)
-  create(@Body() data: CreateActivity) {
-    return this.activityService.create(data).pipe(
+  create(@Body() data: CreateActivity, @Req() req: AuthenticatedResponse) {
+    return this.activityService.create({ ...data, ownerId: req.user.id }).pipe(
       catchError((e) => {
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
       }),
@@ -163,7 +168,7 @@ export class ActivityController implements OnModuleInit {
       oneOf: [findOneByOwner, findOneByNotOwner].map(zodToOpenAPI),
     },
   })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string, @Req() req: AuthenticatedResponse) {
     const makeActivityUser = ({
       name,
       surname,
@@ -198,9 +203,7 @@ export class ActivityController implements OnModuleInit {
         const owner = activityUsers.slice(0, 1)[0]
         const joinedUsers = activityUsers.slice(1)
 
-        const userId = 'userIdRequest' // TODO: get user id from req
-
-        if (ownerId === userId) {
+        if (ownerId === req.user.id) {
           const dto: FindOneByOwner = {
             joinedUsers,
             ownerId,

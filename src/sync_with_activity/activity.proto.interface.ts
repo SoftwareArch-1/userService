@@ -4,7 +4,9 @@ import { createZodDto } from 'nestjs-zod'
 import { ActivityModel } from './zod'
 
 export interface ActivityService {
-  create: (data: CreateActivity) => Observable<Activity>
+  create: (
+    data: z.infer<typeof createActivitySchemaWithOwnerId>,
+  ) => Observable<Activity>
   findOne: (data: ActivityById) => Observable<Activity>
   findMany(data: FindManyParams): Observable<Activity>
   join: (data: JoinActivity) => Observable<Activity>
@@ -13,7 +15,6 @@ export interface ActivityService {
   acceptJoin: (data: AcceptJoin) => Observable<Activity>
   declineJoin: (data: DeclineJoin) => Observable<Activity>
 }
-
 
 export const acceptJoinSchema = z.object({
   activityId: z.string(),
@@ -48,7 +49,6 @@ export interface ActivityById {
 export const createActivitySchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
-  ownerId: z.string(),
   targetDate: z.string(),
   maxParticipants: z.number().int().min(1),
   requireLine: z.boolean(),
@@ -57,13 +57,13 @@ export const createActivitySchema = z.object({
   location: z.string().nullish(),
 })
 
+const createActivitySchemaWithOwnerId = createActivitySchema.extend({
+  ownerId: z.string(),
+})
+
 export const joinActivitySchema = z.object({
   activityId: z.string(),
   joinerId: z.string(),
-})
-
-export const findOwnedActivitiesSchema = z.object({
-  ownerId: z.string(),
 })
 
 export class JoinActivity extends createZodDto(joinActivitySchema) {}
