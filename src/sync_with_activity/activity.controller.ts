@@ -17,6 +17,7 @@ import { User } from '@prisma/client'
 
 import { ActivityUser } from './activity-user'
 import {
+  AcceptJoin,
   ActivityService,
   CreateActivity,
   JoinActivity,
@@ -57,6 +58,17 @@ export class ActivityController implements OnModuleInit {
       }),
       map((data) => eachInAll.parse(data)),
       toArray(),
+    )
+  }
+
+  @Post('accept-join')
+  @ApiResponse({})
+  @UseZodGuard('body', AcceptJoin)
+  acceptJoin(@Body() data: AcceptJoin) {
+    return this.activityService.acceptJoin(data).pipe(
+      catchError((e) => {
+        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+      }),
     )
   }
 

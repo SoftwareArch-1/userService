@@ -9,7 +9,15 @@ export interface ActivityService {
   findMany(data: FindManyParams): Observable<Activity>
   join: (data: JoinActivity) => Observable<Activity>
   findOwnedActivities: (data: FindOwnedActivities) => Observable<Activity>
+  acceptJoin: (data: AcceptJoin) => Observable<Activity>
 }
+
+export const acceptJoinSchema = z.object({
+  activityId: z.string(),
+  joinerId: z.string(),
+})
+
+export class AcceptJoin extends createZodDto(acceptJoinSchema) {}
 
 export interface FindOwnedActivities {
   ownerId: string
