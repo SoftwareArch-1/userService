@@ -67,6 +67,7 @@ export class UserController {
     )
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseZodGuard('body', UpdateUserDto)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
