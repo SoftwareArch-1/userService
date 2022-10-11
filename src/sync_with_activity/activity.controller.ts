@@ -2,8 +2,9 @@ import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
 import { prismaClient } from 'prisma/script'
 import { catchError, map, toArray } from 'rxjs/operators'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { AuthenticatedRequest } from 'src/types'
 
-import { OnModuleInit } from '@nestjs/common'
+import { OnModuleInit, Req } from '@nestjs/common'
 import {
   Body,
   Controller,
@@ -54,32 +55,36 @@ export class ActivityController implements OnModuleInit {
       this.client.getService<ActivityService>('ActivityService')
   }
 
-  @Get('joined/:userId')
+  @Get('joined')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findJoinedActivities(@Param('userId') joinerId: string) {
-    return this.activityService.findJoinedActivities({ joinerId }).pipe(
-      catchError((e) => {
-        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
-      }),
-      map((data) => eachInAll.parse(data)),
-      toArray(),
-    )
+  findJoinedActivities(@Req() req: AuthenticatedRequest) {
+    return this.activityService
+      .findJoinedActivities({ joinerId: req.user.id })
+      .pipe(
+        catchError((e) => {
+          throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+        }),
+        map((data) => eachInAll.parse(data)),
+        toArray(),
+      )
   }
 
-  @Get('owned/:userId')
+  @Get('owned')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findOwnedActivities(@Param('userId') ownerId: string) {
-    return this.activityService.findOwnedActivities({ ownerId }).pipe(
-      catchError((e) => {
-        throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
-      }),
-      map((data) => eachInAll.parse(data)),
-      toArray(),
-    )
+  findOwnedActivities(@Req() req: AuthenticatedRequest) {
+    return this.activityService
+      .findOwnedActivities({ ownerId: req.user.id })
+      .pipe(
+        catchError((e) => {
+          throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
+        }),
+        map((data) => eachInAll.parse(data)),
+        toArray(),
+      )
   }
 
   @Post('accept-join')
@@ -119,8 +124,8 @@ export class ActivityController implements OnModuleInit {
     ),
   })
   @UseZodGuard('body', JoinActivity)
-  join(@Body() data: JoinActivity) {
-    return this.activityService.join(data).pipe(
+  join(@Body() data: JoinActivity, @Req() req: AuthenticatedRequest) {
+    return this.activityService.join({ ...data, joinerId: req.user.id }).pipe(
       catchError((e) => {
         // failed to join since maximum participants reached?
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
@@ -138,8 +143,8 @@ export class ActivityController implements OnModuleInit {
     schema: zodToOpenAPI(ActivityModel),
   })
   @UseZodGuard('body', CreateActivity)
-  create(@Body() data: CreateActivity) {
-    return this.activityService.create(data).pipe(
+  create(@Body() data: CreateActivity, @Req() req: AuthenticatedRequest) {
+    return this.activityService.create({ ...data, ownerId: req.user.id }).pipe(
       catchError((e) => {
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
       }),
@@ -164,7 +169,7 @@ export class ActivityController implements OnModuleInit {
       oneOf: [findOneByOwner, findOneByNotOwner].map(zodToOpenAPI),
     },
   })
-  findOne(@Param('activityId') id: string, @Param('userId') userId: string) {
+  findOne(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     const makeActivityUser = ({
       name,
       surname,
@@ -199,7 +204,7 @@ export class ActivityController implements OnModuleInit {
         const owner = activityUsers.slice(0, 1)[0]
         const joinedUsers = activityUsers.slice(1)
 
-        if (ownerId === userId) {
+        if (ownerId === req.user.id) {
           const dto: FindOneByOwner = {
             joinedUsers,
             ownerId,
@@ -214,10 +219,10 @@ export class ActivityController implements OnModuleInit {
         }
 
         const status: keyof typeof ActivityStatus = joinedUserIds.includes(
-          userId,
+          req.user.id,
         )
           ? 'joined'
-          : pendingUserIds.includes(userId)
+          : pendingUserIds.includes(req.user.id)
           ? 'pending'
           : 'not-joined'
 
