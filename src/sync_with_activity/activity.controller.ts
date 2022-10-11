@@ -54,11 +54,11 @@ export class ActivityController implements OnModuleInit {
       this.client.getService<ActivityService>('ActivityService')
   }
 
-  @Get('joined/:joinerId')
+  @Get('joined/:userId')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findJoinedActivities(@Param('joinerId') joinerId: string) {
+  findJoinedActivities(@Param('userId') joinerId: string) {
     return this.activityService.findJoinedActivities({ joinerId }).pipe(
       catchError((e) => {
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
@@ -68,11 +68,11 @@ export class ActivityController implements OnModuleInit {
     )
   }
 
-  @Get('owned/:ownerId')
+  @Get('owned/:userId')
   @ApiResponse({
     schema: zodToOpenAPI(findAllActivityDto),
   })
-  findOwnedActivities(@Param('ownerId') ownerId: string) {
+  findOwnedActivities(@Param('userId') ownerId: string) {
     return this.activityService.findOwnedActivities({ ownerId }).pipe(
       catchError((e) => {
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
