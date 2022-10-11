@@ -21,22 +21,8 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request, @Res() res: Response) {
-    console.log(req.user)
-    // return this.authService.login(req.user)
-
-    const token = await this.authService.login(req)
-    return res
-      .cookie(process.env.TOKEN_NAME as string, token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        expires: new Date(
-          Date.now() + Number(process.env.JWT_EXPIRE_MILLISECONDS),
-        ),
-      })
-      .status(HttpStatus.OK)
-      .json({ success: true })
+  async login(@Req() req) {
+    return this.authService.login(req.user)
   }
 
   @Post('logout')
@@ -44,7 +30,7 @@ export class AuthController {
     this.authService.logout(req.cookies[process.env.TOKEN_NAME as string])
     res.clearCookie(process.env.TOKEN_NAME as string, {
       sameSite: 'none',
-      secure: true,
+      // secure: true,
     })
     // res.clearCookie(process.env.TOKEN_NAME);
     res.status(HttpStatus.OK).json({ success: true })
