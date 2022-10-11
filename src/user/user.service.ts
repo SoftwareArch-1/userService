@@ -33,7 +33,7 @@ export class UserService {
           ...rest,
         },
       })
-      return this.authService.login({ email: createdUser.email, password })
+      return this.authService.login(createdUser)
       // return stripPassword(createdUser)
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
