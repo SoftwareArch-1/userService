@@ -123,8 +123,8 @@ export class ActivityController implements OnModuleInit {
     ),
   })
   @UseZodGuard('body', JoinActivity)
-  join(@Body() data: JoinActivity) {
-    return this.activityService.join(data).pipe(
+  join(@Body() data: JoinActivity, @Req() req: AuthenticatedRequest) {
+    return this.activityService.join({ ...data, joinerId: req.user.id }).pipe(
       catchError((e) => {
         // failed to join since maximum participants reached?
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)

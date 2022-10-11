@@ -9,7 +9,9 @@ export interface ActivityService {
   ) => Observable<Activity>
   findOne: (data: ActivityById) => Observable<Activity>
   findMany(data: FindManyParams): Observable<Activity>
-  join: (data: JoinActivity) => Observable<Activity>
+  join: (
+    data: z.infer<typeof joinActivitySchemaWithJoinerId>,
+  ) => Observable<Activity>
   findOwnedActivities: (data: FindOwnedActivities) => Observable<Activity>
   findJoinedActivities: (data: FindJoinedActivities) => Observable<Activity>
   acceptJoin: (data: AcceptJoin) => Observable<Activity>
@@ -63,6 +65,9 @@ const createActivitySchemaWithOwnerId = createActivitySchema.extend({
 
 export const joinActivitySchema = z.object({
   activityId: z.string(),
+})
+
+const joinActivitySchemaWithJoinerId = joinActivitySchema.extend({
   joinerId: z.string(),
 })
 
