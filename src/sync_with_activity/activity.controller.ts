@@ -1,6 +1,7 @@
 import { UseZodGuard, zodToOpenAPI } from 'nestjs-zod'
 import { prismaClient } from 'prisma/script'
 import { catchError, map, toArray } from 'rxjs/operators'
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 
 import { OnModuleInit } from '@nestjs/common'
 import {
@@ -10,11 +11,12 @@ import {
   Inject,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common/decorators'
 import { HttpStatus } from '@nestjs/common/enums'
 import { HttpException } from '@nestjs/common/exceptions'
 import { ClientGrpc } from '@nestjs/microservices'
-import { ApiHeader, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { User } from '@prisma/client'
 
 import { ActivityUser } from './activity-user'
@@ -37,6 +39,7 @@ import {
 import { ActivityModel } from './zod'
 
 @Controller('activity')
+@UseGuards(JwtAuthGuard)
 @ApiTags('activity')
 export class ActivityController implements OnModuleInit {
   constructor(
