@@ -29,7 +29,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
-  @UseZodGuard('body', LoginDto)
+  // @UseZodGuard('body', LoginDto)
   @Post('login')
   async login(
     @Req() req,
