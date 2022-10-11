@@ -164,7 +164,7 @@ export class ActivityController implements OnModuleInit {
       oneOf: [findOneByOwner, findOneByNotOwner].map(zodToOpenAPI),
     },
   })
-  findOne(@Param('id') id: string, @Param('userId') userId: string) {
+  findOne(@Param('activityId') id: string, @Param('userId') userId: string) {
     const makeActivityUser = ({
       name,
       surname,
