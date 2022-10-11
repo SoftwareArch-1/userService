@@ -12,7 +12,7 @@ import {
   Post,
 } from '@nestjs/common/decorators'
 import { ClientGrpc } from '@nestjs/microservices'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { User } from '@prisma/client'
 
 import { ActivityUser } from './activity-user'
@@ -47,6 +47,9 @@ export class ActivityController implements OnModuleInit {
   }
 
   @Get('find-owned-activities/:ownerId')
+  @ApiResponse({
+    schema: zodToOpenAPI(findAllActivityDto),
+  })
   findOwnedActivities(@Param('ownerId') ownerId: string) {
     return this.activityService.findOwnedActivities({ ownerId }).pipe(
       catchError((e) => {
@@ -57,7 +60,14 @@ export class ActivityController implements OnModuleInit {
     )
   }
 
-  @Post('join')
+  @Post('request-join')
+  @ApiResponse({
+    schema: zodToOpenAPI(
+      ActivityModel.omit({
+        pendingUserIds: true,
+      }),
+    ),
+  })
   @UseZodGuard('body', JoinActivity)
   join(@Body() data: JoinActivity) {
     return this.activityService.join(data).pipe(
@@ -65,6 +75,11 @@ export class ActivityController implements OnModuleInit {
         // failed to join since maximum participants reached?
         throw new HttpException(e.details, HttpStatus.BAD_REQUEST)
       }),
+      map((data) =>
+        ActivityModel.omit({
+          pendingUserIds: true,
+        }).parse(data),
+      ),
     )
   }
 
