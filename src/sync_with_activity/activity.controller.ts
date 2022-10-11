@@ -158,13 +158,13 @@ export class ActivityController implements OnModuleInit {
     )
   }
 
-  @Get(':id')
+  @Get(':activityId/:userId')
   @ApiResponse({
     schema: {
       oneOf: [findOneByOwner, findOneByNotOwner].map(zodToOpenAPI),
     },
   })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string, @Param('userId') userId: string) {
     const makeActivityUser = ({
       name,
       surname,
@@ -199,8 +199,6 @@ export class ActivityController implements OnModuleInit {
         const owner = activityUsers.slice(0, 1)[0]
         const joinedUsers = activityUsers.slice(1)
 
-        const userId = 'userIdRequest' // TODO: get user id from req
-
         if (ownerId === userId) {
           const dto: FindOneByOwner = {
             joinedUsers,
@@ -216,10 +214,10 @@ export class ActivityController implements OnModuleInit {
         }
 
         const status: keyof typeof ActivityStatus = joinedUserIds.includes(
-          'req.user.id', // FIXME: get user id from req
+          userId,
         )
           ? 'joined'
-          : pendingUserIds.includes('req.user.id') // FIXME
+          : pendingUserIds.includes(userId)
           ? 'pending'
           : 'not-joined'
 
