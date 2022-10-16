@@ -11,8 +11,6 @@ export type WsRes<T> =
       error: string
     }
 
-export const wsRes = <T>(res: WsRes<T>) => res
-
 interface ServerToClientEvents {
   /**
    * Clients should listen to this event to receive error messages from the server
@@ -31,11 +29,11 @@ export interface T<
 > {
   echo: {
     res: EchoRes
-    emit: ClientEmit<EchoT, EchoRes>
+    emit: ClientEmit<EchoT, T['echo']['res']>
   }
   post: {
     res: PostRes
-    emit: ClientEmit<{ content: string }, PostRes>
+    emit: ClientEmit<{ content: string }, T['post']['res']>
   }
 }
 
