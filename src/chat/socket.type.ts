@@ -46,7 +46,7 @@ export interface T<
 > {
   echo: {
     res: EchoRes
-    emit: ClientEmit<EchoT, T['echo']['res']>
+    emit: ClientEmit<ClientEmitDto<'echo'>, T['echo']['res']>
   }
   post: {
     res: PostRes

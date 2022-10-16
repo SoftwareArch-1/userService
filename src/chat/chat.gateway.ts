@@ -24,7 +24,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
 
   handleConnection(client: ChatSocket) {
     const { userId, activityId } = client.handshake.query
-
     if (typeof userId !== 'string' || typeof activityId !== 'string') {
       this.chatService.error(
         'Send userId as query parameter when establishing connection, like this, io("...", { query: { userId: "userId", activityId: "activityId" }})',
