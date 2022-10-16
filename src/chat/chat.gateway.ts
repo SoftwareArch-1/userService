@@ -38,7 +38,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   @SubscribeMessage<ClientToServerEventNames>('echo')
-  echo(@MessageBody() data: string): T['echo']['res'] {
+  echo(@MessageBody() data: string) {
     return this.chatService.echo(data)
   }
 }

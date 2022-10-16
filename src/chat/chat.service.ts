@@ -2,7 +2,7 @@ import { z } from 'nestjs-zod/z'
 
 import { Injectable } from '@nestjs/common'
 
-import { ChatServer, WsRes, wsRes } from './socket.type'
+import { ChatServer, T } from './socket.type'
 
 @Injectable()
 export class ChatService {
@@ -16,10 +16,10 @@ export class ChatService {
     this.server.emit('error', msg)
   }
 
-  echo(data: string): WsRes<string> {
+  echo(data: string): T['echo']['res'] {
     if (z.string().safeParse(data).success) {
-      return wsRes({ data })
+      return { data }
     }
-    return wsRes({ error: 'Message must be of type string' })
+    return { error: 'Message must be of type string' }
   }
 }
