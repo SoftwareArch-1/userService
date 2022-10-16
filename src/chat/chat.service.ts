@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common'
 
-import { ChatServer, ClientEmitDto, clientEmitDto, T } from './socket.type'
+import {
+  ChatServer,
+  ChatSocket,
+  ClientEmitDto,
+  clientEmitDto,
+  T,
+} from './socket.type'
 
 @Injectable()
 export class ChatService {
@@ -37,12 +43,26 @@ export class ChatService {
     return { data: result.parsed }
   }
 
-  error(msg: string) {
-    this.server.emit('error', msg)
-  }
-
   setServer(server: ChatServer) {
     this.server = server
+  }
+
+  handleConnection(client: ChatSocket) {
+    const { userId, activityId } = client.handshake.query
+
+    if (typeof userId !== 'string' || typeof activityId !== 'string') {
+      this.server
+        .to(client.id)
+        .emit(
+          'err',
+          'Send userId as query parameter when establishing connection, like this, io("...", { query: { userId: "userId", activityId: "activityId" }})',
+        )
+      client.disconnect()
+      return
+    }
+
+    client.data.userId = userId
+    client.data.activityId = activityId
   }
 
   private server: ChatServer

@@ -16,7 +16,7 @@ interface ServerToClientEvents {
   /**
    * Clients should listen to this event to receive error messages from the server
    */
-  error: (msg: string) => void
+  err: (msg: string) => void
 }
 
 export type Ack<T> = (res: T) => void

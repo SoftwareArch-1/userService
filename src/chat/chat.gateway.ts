@@ -7,11 +7,7 @@ import {
 } from '@nestjs/websockets'
 
 import { ChatService } from './chat.service'
-import {
-  ChatServer,
-  ChatSocket,
-  ClientToServerEventNames,
-} from './socket.type'
+import { ChatServer, ChatSocket, ClientToServerEventNames } from './socket.type'
 
 @WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
@@ -22,22 +18,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   handleConnection(client: ChatSocket) {
-    const { userId, activityId } = client.handshake.query
-    if (typeof userId !== 'string' || typeof activityId !== 'string') {
-      this.chatService.error(
-        'Send userId as query parameter when establishing connection, like this, io("...", { query: { userId: "userId", activityId: "activityId" }})',
-      )
-      client.disconnect()
-      return
-    }
-
-    client.data.userId = userId
-    client.data.activityId = activityId
-  }
-
-  @SubscribeMessage<ClientToServerEventNames>('echo')
-  echo(@MessageBody() data: string) {
-    return this.chatService.echo(data)
+    this.chatService.handleConnection(client)
   }
 
   @SubscribeMessage<ClientToServerEventNames>('post')
@@ -48,5 +29,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
   @SubscribeMessage<ClientToServerEventNames>('favorite')
   favorite(@MessageBody() data: any) {
     return this.chatService.favorite(data)
+  }
+
+  @SubscribeMessage<ClientToServerEventNames>('echo')
+  echo(@MessageBody() data: string) {
+    return this.chatService.echo(data)
   }
 }
