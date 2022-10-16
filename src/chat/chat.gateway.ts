@@ -11,7 +11,7 @@ import {
   ChatServer,
   ChatSocket,
   ClientToServerEventNames,
-  WsRes,
+  T,
 } from './socket.type'
 
 @WebSocketGateway()
@@ -35,7 +35,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   @SubscribeMessage<ClientToServerEventNames>('echo')
-  echo(@MessageBody() data: string): WsRes<typeof data> {
+  echo(@MessageBody() data: string): T['echo']['res'] {
     return this.chatService.echo(data)
   }
 }

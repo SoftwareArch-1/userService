@@ -20,10 +20,28 @@ interface ServerToClientEvents {
   error: (msg: string) => void
 }
 
-type Ack<T> = (res: WsRes<T>) => void
+export type Ack<T> = (res: T) => void
+
+export type ClientEmit<TData, TRes> = (data: TData, cb?: Ack<TRes>) => void
+
+export interface T<
+  EchoT = string,
+  EchoRes = WsRes<EchoT>,
+  PostRes = WsRes<string>,
+> {
+  echo: {
+    res: EchoRes
+    emit: ClientEmit<EchoT, EchoRes>
+  }
+  post: {
+    res: PostRes
+    emit: ClientEmit<{ content: string }, PostRes>
+  }
+}
 
 interface ClientToServerEvents {
-  echo: <T = string>(msg: T, cb: Ack<T>) => void
+  echo: T['echo']['emit']
+  post: T['post']['emit']
 }
 
 export type ClientToServerEventNames = keyof ClientToServerEvents
