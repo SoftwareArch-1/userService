@@ -35,8 +35,12 @@ export const clientEmitDto = z.object({
   echo: z.string(),
 })
 
+export type ClientEmitDto<K extends keyof typeof clientEmitDto.shape> = z.infer<
+  typeof clientEmitDto.shape[K]
+>
+
 export interface T<
-  EchoT = z.infer<typeof clientEmitDto.shape.echo>,
+  EchoT = ClientEmitDto<'echo'>,
   EchoRes = WsRes<EchoT>,
   PostRes = WsRes<string>,
 > {
@@ -46,14 +50,11 @@ export interface T<
   }
   post: {
     res: PostRes
-    emit: ClientEmit<z.infer<typeof clientEmitDto.shape.post>, T['post']['res']>
+    emit: ClientEmit<ClientEmitDto<'post'>, T['post']['res']>
   }
   favorite: {
     res: WsRes<string>
-    emit: ClientEmit<
-      z.infer<typeof clientEmitDto.shape.favorite>,
-      T['favorite']['res']
-    >
+    emit: ClientEmit<ClientEmitDto<'favorite'>, T['favorite']['res']>
   }
 }
 

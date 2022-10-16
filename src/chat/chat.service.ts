@@ -2,7 +2,7 @@ import { z } from 'nestjs-zod/z'
 
 import { Injectable } from '@nestjs/common'
 
-import { ChatServer, clientEmitDto, T } from './socket.type'
+import { ChatServer, ClientEmitDto, clientEmitDto, T } from './socket.type'
 
 @Injectable()
 export class ChatService {
@@ -12,6 +12,7 @@ export class ChatService {
       return { error: result.error }
     }
 
+    // TODO
     return {
       data: 'favorite todo',
     }
@@ -23,6 +24,7 @@ export class ChatService {
       return { error: result.error }
     }
 
+    // TODO
     return {
       data: 'post todo',
     }
@@ -53,7 +55,7 @@ const parseDto = <K extends keyof typeof clientEmitDto.shape>(
   kind: K,
 ):
   | {
-      parsed: z.infer<typeof clientEmitDto.shape[K]>
+      parsed: ClientEmitDto<K>
       success: true
     }
   | {
