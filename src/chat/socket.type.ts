@@ -21,7 +21,10 @@ interface ServerToClientEvents {
 
 export type Ack<T> = (res: T) => void
 
-export type ClientEmit<TData, TRes> = (data: TData, cb?: Ack<TRes>) => void
+export type ClientEmit<TData, TRes> = (
+  clientEmitDto: TData,
+  cb?: Ack<TRes>,
+) => void
 
 export const clientEmitDto = z.object({
   post: z.object({
@@ -39,17 +42,13 @@ export type ClientEmitDto<K extends keyof typeof clientEmitDto.shape> = z.infer<
   typeof clientEmitDto.shape[K]
 >
 
-export interface T<
-  EchoT = ClientEmitDto<'echo'>,
-  EchoRes = WsRes<EchoT>,
-  PostRes = WsRes<string>,
-> {
+export interface T {
   echo: {
-    res: EchoRes
+    res: WsRes<ClientEmitDto<'echo'>>
     emit: ClientEmit<ClientEmitDto<'echo'>, T['echo']['res']>
   }
   post: {
-    res: PostRes
+    res: WsRes<string>
     emit: ClientEmit<ClientEmitDto<'post'>, T['post']['res']>
   }
   favorite: {

@@ -11,7 +11,6 @@ import {
   ChatServer,
   ChatSocket,
   ClientToServerEventNames,
-  T,
 } from './socket.type'
 
 @WebSocketGateway()
