@@ -1,13 +1,18 @@
 import {
   MessageBody,
   OnGatewayConnection,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
-  OnGatewayInit,
 } from '@nestjs/websockets'
 
 import { ChatService } from './chat.service'
-import { ChatServer, ChatSocket, WsRes } from './socket.type'
+import {
+  ChatServer,
+  ChatSocket,
+  ClientToServerEventNames,
+  WsRes,
+} from './socket.type'
 
 @WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
@@ -29,7 +34,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
     client.data.userId = userId
   }
 
-  @SubscribeMessage('echo')
+  @SubscribeMessage<ClientToServerEventNames>('echo')
   echo(@MessageBody() data: string): WsRes<typeof data> {
     return this.chatService.echo(data)
   }

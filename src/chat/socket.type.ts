@@ -26,6 +26,8 @@ interface ClientToServerEvents {
   echo: <T = string>(msg: T, cb: Ack<T>) => void
 }
 
+export type ClientToServerEventNames = keyof ClientToServerEvents
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface InterServerEvents {}
 
