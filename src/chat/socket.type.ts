@@ -51,6 +51,7 @@ interface InterServerEvents {}
 
 interface SocketData {
   userId: string | undefined
+  activityId: string | undefined
 }
 
 export type ChatSocket = Socket<

@@ -23,15 +23,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   handleConnection(client: ChatSocket) {
-    const { userId } = client.handshake.query
-    if (typeof userId !== 'string') {
+    const { userId, activityId } = client.handshake.query
+
+    if (typeof userId !== 'string' || typeof activityId !== 'string') {
       this.chatService.error(
-        'Send userId as query parameter when establishing connection, like this, io("...", { query: { userId: "userId" }})',
+        'Send userId as query parameter when establishing connection, like this, io("...", { query: { userId: "userId", activityId: "activityId" }})',
       )
       client.disconnect()
       return
     }
+
     client.data.userId = userId
+    client.data.activityId = activityId
   }
 
   @SubscribeMessage<ClientToServerEventNames>('echo')
