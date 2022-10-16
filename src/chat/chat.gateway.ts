@@ -3,20 +3,24 @@ import {
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
+  OnGatewayInit,
 } from '@nestjs/websockets'
-import { Socket } from 'socket.io'
 
 import { ChatService } from './chat.service'
-import { WsRes } from './dto/base'
+import { ChatServer, ChatSocket, WsRes } from './socket.type'
 
 @WebSocketGateway()
-export class ChatGateway implements OnGatewayConnection {
+export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
   constructor(private readonly chatService: ChatService) {}
 
-  handleConnection(client: Socket) {
+  afterInit(server: ChatServer) {
+    this.chatService.setServer(server)
+  }
+
+  handleConnection(client: ChatSocket) {
     const { userId } = client.handshake.query
     if (typeof userId !== 'string') {
-      client.send(
+      this.chatService.error(
         'Send userId as query parameter when establishing connection, like this, io("...", { query: { userId: "userId" }})',
       )
       client.disconnect()
