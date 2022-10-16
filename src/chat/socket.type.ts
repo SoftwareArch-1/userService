@@ -1,3 +1,4 @@
+import { z } from 'nestjs-zod/z'
 import { Server, Socket } from 'socket.io'
 
 // data or error, but not both
@@ -22,8 +23,20 @@ export type Ack<T> = (res: T) => void
 
 export type ClientEmit<TData, TRes> = (data: TData, cb?: Ack<TRes>) => void
 
+export const clientEmitDto = z.object({
+  post: z.object({
+    content: z.string().min(1),
+  }),
+
+  favorite: z.object({
+    messageId: z.string(),
+  }),
+
+  echo: z.string(),
+})
+
 export interface T<
-  EchoT = string,
+  EchoT = z.infer<typeof clientEmitDto.shape.echo>,
   EchoRes = WsRes<EchoT>,
   PostRes = WsRes<string>,
 > {
@@ -33,13 +46,21 @@ export interface T<
   }
   post: {
     res: PostRes
-    emit: ClientEmit<{ content: string }, T['post']['res']>
+    emit: ClientEmit<z.infer<typeof clientEmitDto.shape.post>, T['post']['res']>
+  }
+  favorite: {
+    res: WsRes<string>
+    emit: ClientEmit<
+      z.infer<typeof clientEmitDto.shape.favorite>,
+      T['favorite']['res']
+    >
   }
 }
 
 interface ClientToServerEvents {
   echo: T['echo']['emit']
   post: T['post']['emit']
+  favorite: T['favorite']['emit']
 }
 
 export type ClientToServerEventNames = keyof ClientToServerEvents

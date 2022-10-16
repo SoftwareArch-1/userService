@@ -41,4 +41,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit {
   echo(@MessageBody() data: string) {
     return this.chatService.echo(data)
   }
+
+  @SubscribeMessage<ClientToServerEventNames>('post')
+  post(@MessageBody() data: any) {
+    return this.chatService.post(data)
+  }
+
+  @SubscribeMessage<ClientToServerEventNames>('favorite')
+  favorite(@MessageBody() data: any) {
+    return this.chatService.favorite(data)
+  }
 }
