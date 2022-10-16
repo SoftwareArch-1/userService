@@ -1,5 +1,3 @@
-import { z } from 'nestjs-zod/z'
-
 import { Injectable } from '@nestjs/common'
 
 import { ChatServer, ClientEmitDto, clientEmitDto, T } from './socket.type'
