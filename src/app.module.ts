@@ -8,9 +8,10 @@ import { ReviewModule } from './review/review.module'
 import { ReviewService } from './review/review.service'
 import { ActivityModule } from './sync_with_activity/activity.module'
 import { UserModule } from './user/user.module'
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [UserModule, AuthModule, ReviewModule, AppModule, ActivityModule],
+  imports: [UserModule, AuthModule, ReviewModule, AppModule, ActivityModule, ChatModule],
   controllers: [AppController],
   providers: [AppService, ReviewService, LocalStrategy],
 })
