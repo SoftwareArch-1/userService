@@ -48,11 +48,21 @@ export interface T {
     emit: ClientEmit<ClientEmitDto<'echo'>, T['echo']['res']>
   }
   post: {
-    res: WsRes<string>
+    res: WsRes<{
+      id: string
+      content: string
+      createdAt: string
+      likes: number
+    }>
     emit: ClientEmit<ClientEmitDto<'post'>, T['post']['res']>
   }
   favorite: {
-    res: WsRes<string>
+    res: WsRes<{
+      id: string
+      content: string
+      createdAt: string
+      likes: number
+    }>
     emit: ClientEmit<ClientEmitDto<'favorite'>, T['favorite']['res']>
   }
 }

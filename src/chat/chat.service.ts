@@ -18,11 +18,16 @@ export class ChatService {
 
     // TODO
     return {
-      data: 'favorite todo',
+      data: {
+        id: 'id',
+        content: 'content',
+        createdAt: new Date().toISOString(),
+        likes: 1,
+      },
     }
   }
 
-  post(data: { content: string }) {
+  post(data: { content: string }): T['post']['res'] {
     const result = parseDto(data, 'post')
     if (!result.success) {
       return { error: result.error }
@@ -30,7 +35,12 @@ export class ChatService {
 
     // TODO
     return {
-      data: 'post todo',
+      data: {
+        id: 'id',
+        content: result.parsed.content,
+        createdAt: new Date().toISOString(),
+        likes: 0,
+      },
     }
   }
 
