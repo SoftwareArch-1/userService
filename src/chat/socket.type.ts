@@ -12,21 +12,21 @@ export type WsRes<T> =
       error: string
     }
 
+type ServerEmit<T> = (res: WsRes<T>) => void
+
 interface ServerToClientEvents {
   /**
    * Clients should listen to this event to receive error messages from the server
    */
   err: (msg: string) => void
-  initialData: (
-    res: WsRes<
-      {
-        id: string
-        content: string
-        createdAt: string
-        likes: number
-      }[]
-    >,
-  ) => void
+  initialData: ServerEmit<
+    {
+      id: string
+      content: string
+      createdAt: string
+      likes: number
+    }[]
+  >
 }
 
 export type Ack<T> = (res: T) => void
