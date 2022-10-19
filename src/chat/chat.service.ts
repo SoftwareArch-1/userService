@@ -10,7 +10,6 @@ import {
   ClientEmitDto,
   clientEmitDto,
   T,
-  WsRes,
 } from './socket.type'
 
 import type { ClientRMQ } from '@nestjs/microservices'
@@ -28,6 +27,7 @@ export class ChatService {
 
     return this.client.send(MessagePatFromGateway.Favorite, result.parsed).pipe(
       map((res) => {
+        console.log('>>> | res', res)
         // TODO map res to T['favorite']['res']
         return {
           data: {
@@ -52,6 +52,7 @@ export class ChatService {
 
     return this.client.send(MessagePatFromGateway.Post, result.parsed).pipe(
       map((res) => {
+        console.log('>>> | res', res)
         // TODO map res to T['post']['res']
         return {
           data: {
@@ -149,6 +150,7 @@ export class ChatService {
           likes: number
         }
       >((res) => {
+        console.log('>>> | res', res)
         // TODO map res
         return {
           id: Math.random().toString(),
