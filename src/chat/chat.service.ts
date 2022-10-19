@@ -95,6 +95,13 @@ export class ChatService {
 
     client.data.userId = userId
     client.data.activityId = activityId
+
+    // room name is the activityId
+    client.join(activityId)
+  }
+
+  handleDisconnect(client: ChatSocket) {
+    client.data.activityId && client.leave(client.data.activityId)
   }
 
   private server: ChatServer
