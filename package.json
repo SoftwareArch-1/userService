@@ -39,6 +39,8 @@
     "@nestjs/websockets": "^9.1.4",
     "@prisma/client": "4.3.1",
     "@types/cookie-parser": "^1.4.3",
+    "amqp-connection-manager": "^4.1.7",
+    "amqplib": "^0.10.3",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "nestjs-zod": "^1.2.1",
