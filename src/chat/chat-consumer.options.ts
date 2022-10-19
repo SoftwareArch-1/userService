@@ -1,5 +1,5 @@
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
-import { queueNames } from './messages'
+import { queueNames } from './synced-configs'
 
 export const chatConsumerConfig: MicroserviceOptions = {
   options: {

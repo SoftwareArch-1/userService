@@ -3,7 +3,7 @@ import { catchError, map, Observable, of } from 'rxjs'
 
 import { Inject, Injectable } from '@nestjs/common'
 
-import { MessagePatFromGateway } from './messages'
+import { MessagePatFromGateway } from './synced-configs'
 import {
   ChatServer,
   ChatSocket,

@@ -3,7 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
 
 import { ChatGateway } from './chat.gateway'
 import { ChatService } from './chat.service'
-import { queueNames } from './messages'
+import { queueNames } from './synced-configs'
 
 @Module({
   imports: [
