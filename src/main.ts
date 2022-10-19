@@ -5,8 +5,6 @@ import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 import { AppModule } from './app.module'
-import { grpcClientOptions } from './grpc-client.options'
-import { chatConsumerConfig } from './chat/chat-consumer.options'
 
 patchNestJsSwagger()
 
@@ -38,9 +36,6 @@ async function bootstrap() {
     origin: true,
   })
 
-  app.connectMicroservice(chatConsumerConfig)
-
-  await app.startAllMicroservices()
   await app.listen(4000)
   console.log(`Application is running on: ${await app.getUrl()}`)
 }

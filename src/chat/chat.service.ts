@@ -21,7 +21,7 @@ export class ChatService {
     @Inject('CHAT_SERVICE_CLIENT') private readonly client: ClientRMQ,
   ) {}
 
-  favorite(data: any): ObservableOr<T['favorite']['res']> {
+  favorite(data: any, activityId: string): ObservableOr<T['favorite']['res']> {
     const result = parseDto(data, 'favorite')
     if (!result.success) {
       return { error: result.error }
@@ -31,14 +31,14 @@ export class ChatService {
       map((res) => {
         console.log('>>> | res', res)
         // TODO map res to T['favorite']['res']
-        return {
+        const r: T['favorite']['res'] = {
           data: {
             id: 'id',
-            content: 'content',
-            createdAt: new Date().toISOString(),
             likes: 1,
           },
         }
+        this.server.to(activityId).emit('favorited', r)
+        return r
       }),
       catchError((error) => {
         return of({ error })
@@ -46,7 +46,10 @@ export class ChatService {
     )
   }
 
-  post(data: { content: string }): ObservableOr<T['post']['res']> {
+  post(
+    data: { content: string },
+    activityId: string,
+  ): ObservableOr<T['post']['res']> {
     const result = parseDto(data, 'post')
     if (!result.success) {
       return { error: result.error }
@@ -56,7 +59,7 @@ export class ChatService {
       map((res) => {
         console.log('>>> | res', res)
         // TODO map res to T['post']['res']
-        return {
+        const r: T['post']['res'] = {
           data: {
             id: 'id',
             content: 'content',
@@ -64,6 +67,8 @@ export class ChatService {
             likes: 0,
           },
         }
+        this.server.to(activityId).emit('posted', r)
+        return r
       }),
       catchError((error) => {
         return of({ error })

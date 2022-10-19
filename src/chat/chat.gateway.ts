@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -29,13 +30,13 @@ export class ChatGateway
   }
 
   @SubscribeMessage<ClientToServerEventNames>('post')
-  post(@MessageBody() data: any) {
-    return this.chatService.post(data)
+  post(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
+    return this.chatService.post(data, socket.data.activityId as string)
   }
 
   @SubscribeMessage<ClientToServerEventNames>('favorite')
-  favorite(@MessageBody() data: any) {
-    return this.chatService.favorite(data)
+  favorite(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
+    return this.chatService.favorite(data, socket.data.activityId as string)
   }
 
   @SubscribeMessage<ClientToServerEventNames>('echo')

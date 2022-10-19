@@ -27,6 +27,16 @@ interface ServerToClientEvents {
       likes: number
     }[]
   >
+  posted: ServerEmit<{
+    id: string
+    content: string
+    createdAt: string
+    likes: number
+  }>
+  favorited: ServerEmit<{
+    id: string
+    likes: number
+  }>
 }
 
 export type Ack<T> = (res: T) => void
@@ -69,8 +79,6 @@ export interface T {
   favorite: {
     res: WsRes<{
       id: string
-      content: string
-      createdAt: string
       likes: number
     }>
     emit: ClientEmit<ClientEmitDto<'favorite'>, T['favorite']['res']>
