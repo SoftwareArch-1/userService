@@ -27,12 +27,18 @@ interface ServerToClientEvents {
       likes: number
     }[]
   >
+  /**
+   * Emits when a new post is created
+   */
   posted: ServerEmit<{
     id: string
     content: string
     createdAt: string
     likes: number
   }>
+  /**
+   * Emits when a post is favorited
+   */
   favorited: ServerEmit<{
     id: string
     likes: number
