@@ -1,6 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common'
-import type { ClientRMQ } from '@nestjs/microservices'
+import { catchError, map, Observable, of } from 'rxjs'
 
+import { Inject, Injectable } from '@nestjs/common'
+
+import { MessagePatFromGateway } from './messages'
 import {
   ChatServer,
   ChatSocket,
@@ -9,42 +11,59 @@ import {
   T,
 } from './socket.type'
 
+import type { ClientRMQ } from '@nestjs/microservices'
+type ObservableOr<T> = T | Observable<T>
+
 @Injectable()
 export class ChatService {
   constructor(@Inject('CHAT_SERVICE') private readonly client: ClientRMQ) {}
 
-  favorite(data: any): T['favorite']['res'] {
+  favorite(data: any): ObservableOr<T['favorite']['res']> {
     const result = parseDto(data, 'favorite')
     if (!result.success) {
       return { error: result.error }
     }
 
-    // TODO
-    return {
-      data: {
-        id: 'id',
-        content: 'content',
-        createdAt: new Date().toISOString(),
-        likes: 1,
-      },
-    }
+    return this.client.send(MessagePatFromGateway.Favorite, result.parsed).pipe(
+      map((res) => {
+        // TODO map res to T['favorite']['res']
+        return {
+          data: {
+            id: 'id',
+            content: 'content',
+            createdAt: new Date().toISOString(),
+            likes: 1,
+          },
+        }
+      }),
+      catchError((error) => {
+        return of({ error })
+      }),
+    )
   }
 
-  post(data: { content: string }): T['post']['res'] {
+  post(data: { content: string }): ObservableOr<T['post']['res']> {
     const result = parseDto(data, 'post')
     if (!result.success) {
       return { error: result.error }
     }
 
-    // TODO
-    return {
-      data: {
-        id: 'id',
-        content: result.parsed.content,
-        createdAt: new Date().toISOString(),
-        likes: 0,
-      },
-    }
+    return this.client.send(MessagePatFromGateway.Post, result.parsed).pipe(
+      map((res) => {
+        // TODO map res to T['post']['res']
+        return {
+          data: {
+            id: 'id',
+            content: 'content',
+            createdAt: new Date().toISOString(),
+            likes: 0,
+          },
+        }
+      }),
+      catchError((error) => {
+        return of({ error })
+      }),
+    )
   }
 
   echo(data: string): T['echo']['res'] {
