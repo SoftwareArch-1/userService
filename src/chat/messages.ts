@@ -5,3 +5,8 @@ export enum MessagePatFromGateway {
   Favorite,
   Post,
 }
+
+export enum EventPatToGateway {
+  Favorite,
+  Post,
+}
