@@ -2,11 +2,9 @@ import * as cookieParser from 'cookie-parser'
 import { patchNestJsSwagger } from 'nestjs-zod'
 
 import { NestFactory } from '@nestjs/core'
-import { MicroserviceOptions } from '@nestjs/microservices'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 import { AppModule } from './app.module'
-import { grpcClientOptions } from './grpc-client.options'
 
 patchNestJsSwagger()
 

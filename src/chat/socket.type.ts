@@ -12,11 +12,37 @@ export type WsRes<T> =
       error: string
     }
 
+type ServerEmit<T> = (res: WsRes<T>) => void
+
 interface ServerToClientEvents {
   /**
    * Clients should listen to this event to receive error messages from the server
    */
   err: (msg: string) => void
+  initialData: ServerEmit<
+    {
+      id: string
+      content: string
+      createdAt: string
+      likes: number
+    }[]
+  >
+  /**
+   * Emits when a new post is created
+   */
+  posted: ServerEmit<{
+    id: string
+    content: string
+    createdAt: string
+    likes: number
+  }>
+  /**
+   * Emits when a post is favorited
+   */
+  favorited: ServerEmit<{
+    id: string
+    likes: number
+  }>
 }
 
 export type Ack<T> = (res: T) => void
@@ -59,8 +85,6 @@ export interface T {
   favorite: {
     res: WsRes<{
       id: string
-      content: string
-      createdAt: string
       likes: number
     }>
     emit: ClientEmit<ClientEmitDto<'favorite'>, T['favorite']['res']>
