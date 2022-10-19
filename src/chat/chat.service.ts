@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
+import type { ClientRMQ } from '@nestjs/microservices'
 
 import {
   ChatServer,
@@ -10,6 +11,8 @@ import {
 
 @Injectable()
 export class ChatService {
+  constructor(@Inject('CHAT_SERVICE') private readonly client: ClientRMQ) {}
+
   favorite(data: any): T['favorite']['res'] {
     const result = parseDto(data, 'favorite')
     if (!result.success) {
