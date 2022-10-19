@@ -17,7 +17,9 @@ type ObservableOr<T> = T | Observable<T>
 
 @Injectable()
 export class ChatService {
-  constructor(@Inject('CHAT_SERVICE') private readonly client: ClientRMQ) {}
+  constructor(
+    @Inject('CHAT_SERVICE_CLIENT') private readonly client: ClientRMQ,
+  ) {}
 
   favorite(data: any): ObservableOr<T['favorite']['res']> {
     const result = parseDto(data, 'favorite')
