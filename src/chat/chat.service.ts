@@ -1,3 +1,4 @@
+import { toArray } from 'rxjs/operators'
 import { catchError, map, Observable, of } from 'rxjs'
 
 import { Inject, Injectable } from '@nestjs/common'
@@ -9,6 +10,7 @@ import {
   ClientEmitDto,
   clientEmitDto,
   T,
+  WsRes,
 } from './socket.type'
 
 import type { ClientRMQ } from '@nestjs/microservices'
@@ -98,6 +100,68 @@ export class ChatService {
 
     // room name is the activityId
     client.join(activityId)
+
+    // TODO: remove this once we have a response from the call to chat service
+    this.server.to(activityId).emit('initialData', {
+      data: [
+        {
+          id: Math.random().toString(),
+          content: 'content' + Math.random(),
+          createdAt: new Date(
+            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          likes: Math.floor(Math.random() * 100),
+        },
+        {
+          id: Math.random().toString(),
+          content: 'content' + Math.random(),
+          createdAt: new Date(
+            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          likes: Math.floor(Math.random() * 100),
+        },
+        {
+          id: Math.random().toString(),
+          content: 'content' + Math.random(),
+          createdAt: new Date(
+            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          likes: Math.floor(Math.random() * 100),
+        },
+        {
+          id: Math.random().toString(),
+          content: 'content' + Math.random(),
+          createdAt: new Date(
+            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          likes: Math.floor(Math.random() * 100),
+        },
+      ],
+    })
+
+    this.client.send(MessagePatFromGateway.GetAllByActivityId, activityId).pipe(
+      map<
+        any,
+        {
+          id: string
+          content: string
+          createdAt: string
+          likes: number
+        }
+      >((res) => {
+        // TODO map res
+        return {
+          id: Math.random().toString(),
+          content: 'content' + Math.random(),
+          createdAt: new Date().toISOString(),
+          likes: Math.floor(Math.random() * 100),
+        }
+      }),
+      toArray(),
+      map((data) => {
+        this.server.to(activityId).emit('initialData', { data })
+      }),
+    )
   }
 
   handleDisconnect(client: ChatSocket) {

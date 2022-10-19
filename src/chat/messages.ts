@@ -4,6 +4,7 @@
 export enum MessagePatFromGateway {
   Favorite,
   Post,
+  GetAllByActivityId,
 }
 
 export enum EventPatToGateway {

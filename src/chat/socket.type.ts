@@ -17,6 +17,16 @@ interface ServerToClientEvents {
    * Clients should listen to this event to receive error messages from the server
    */
   err: (msg: string) => void
+  initialData: (
+    res: WsRes<
+      {
+        id: string
+        content: string
+        createdAt: string
+        likes: number
+      }[]
+    >,
+  ) => void
 }
 
 export type Ack<T> = (res: T) => void
