@@ -49,31 +49,44 @@ export class ChatService {
   post(
     data: { content: string },
     activityId: string,
+    userId: string,
   ): ObservableOr<T['post']['res']> {
     const result = parseDto(data, 'post')
     if (!result.success) {
       return { error: result.error }
     }
 
-    return this.client.send(MessagePatFromGateway.Post, result.parsed).pipe(
-      map((res) => {
-        console.log('>>> | res', res)
-        // TODO map res to T['post']['res']
-        const r: T['post']['res'] = {
-          data: {
-            id: 'id',
-            content: 'content',
-            createdAt: new Date().toISOString(),
-            likes: 0,
-          },
-        }
-        this.server.to(activityId).emit('posted', r)
-        return r
-      }),
-      catchError((error) => {
-        return of({ error })
-      }),
-    )
+    type PostPayload = {
+      userId: string
+      content: string
+      activityId: string
+    }
+
+    return this.client
+      .send<any, PostPayload>(MessagePatFromGateway.Post, {
+        activityId,
+        userId,
+        content: result.parsed.content,
+      })
+      .pipe(
+        map((res) => {
+          console.log('>>> | res', res)
+          // TODO map res to T['post']['res']
+          const r: T['post']['res'] = {
+            data: {
+              id: 'id',
+              content: 'content',
+              createdAt: new Date().toISOString(),
+              likes: 0,
+            },
+          }
+          this.server.to(activityId).emit('posted', r)
+          return r
+        }),
+        catchError((error) => {
+          return of({ error })
+        }),
+      )
   }
 
   echo(data: string): T['echo']['res'] {

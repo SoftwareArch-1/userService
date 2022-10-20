@@ -33,7 +33,7 @@ export class ChatGateway
 
   @SubscribeMessage<ClientToServerEventNames>('post')
   post(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
-    return this.chatService.post(data, socket.data.activityId as string)
+    return this.chatService.post(data, socket.data.activityId as string, socket.data.userId as string)
   }
 
   @SubscribeMessage<ClientToServerEventNames>('favorite')
