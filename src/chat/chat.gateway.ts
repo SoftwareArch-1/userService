@@ -11,7 +11,9 @@ import {
 import { ChatService } from './chat.service'
 import { ChatServer, ChatSocket, ClientToServerEventNames } from './socket.type'
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: true,
+})
 export class ChatGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
 {
