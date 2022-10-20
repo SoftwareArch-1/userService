@@ -1,6 +1,19 @@
 import { z } from 'nestjs-zod/z'
 import { Server, Socket } from 'socket.io'
 
+export const chatMessageSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  createdAt: z.string(),
+  userId: z.string(),
+  name: z.string(), // name of the user who sent the message
+  likes: z.number().int().min(0).default(0),
+})
+
+export type ChatMessage = z.infer<typeof chatMessageSchema>
+
+export type ChatMsgLikesUpdated = Pick<ChatMessage, 'id' | 'likes'>
+
 // data or error, but not both
 export type WsRes<T> =
   | {
@@ -19,30 +32,15 @@ interface ServerToClientEvents {
    * Clients should listen to this event to receive error messages from the server
    */
   err: (msg: string) => void
-  initialData: ServerEmit<
-    {
-      id: string
-      content: string
-      createdAt: string
-      likes: number
-    }[]
-  >
+  initialData: ServerEmit<ChatMessage[]>
   /**
    * Emits when a new post is created
    */
-  posted: ServerEmit<{
-    id: string
-    content: string
-    createdAt: string
-    likes: number
-  }>
+  posted: ServerEmit<ChatMessage>
   /**
    * Emits when a post is favorited
    */
-  favorited: ServerEmit<{
-    id: string
-    likes: number
-  }>
+  favorited: ServerEmit<ChatMsgLikesUpdated>
 }
 
 export type Ack<T> = (res: T) => void
@@ -74,19 +72,11 @@ export interface T {
     emit: ClientEmit<ClientEmitDto<'echo'>, T['echo']['res']>
   }
   post: {
-    res: WsRes<{
-      id: string
-      content: string
-      createdAt: string
-      likes: number
-    }>
+    res: WsRes<ChatMessage>
     emit: ClientEmit<ClientEmitDto<'post'>, T['post']['res']>
   }
   favorite: {
-    res: WsRes<{
-      id: string
-      likes: number
-    }>
+    res: WsRes<ChatMsgLikesUpdated>
     emit: ClientEmit<ClientEmitDto<'favorite'>, T['favorite']['res']>
   }
 }

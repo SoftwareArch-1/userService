@@ -5,6 +5,7 @@ import { Inject, Injectable } from '@nestjs/common'
 
 import { MessagePatFromGateway } from './synced-configs'
 import {
+  ChatMessage,
   ChatServer,
   ChatSocket,
   ClientEmitDto,
@@ -78,6 +79,8 @@ export class ChatService {
               content: 'content',
               createdAt: new Date().toISOString(),
               likes: 0,
+              userId: 'userId',
+              name: 'name',
             },
           }
           this.server.to(activityId).emit('posted', r)
@@ -132,6 +135,8 @@ export class ChatService {
             Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
           ).toISOString(),
           likes: Math.floor(Math.random() * 100),
+          userId: 'userId',
+          name: 'name',
         },
         {
           id: Math.random().toString(),
@@ -140,6 +145,8 @@ export class ChatService {
             Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
           ).toISOString(),
           likes: Math.floor(Math.random() * 100),
+          userId: 'userId2',
+          name: 'name2',
         },
         {
           id: Math.random().toString(),
@@ -148,6 +155,8 @@ export class ChatService {
             Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
           ).toISOString(),
           likes: Math.floor(Math.random() * 100),
+          userId: 'userId3',
+          name: 'name3',
         },
         {
           id: Math.random().toString(),
@@ -156,20 +165,14 @@ export class ChatService {
             Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
           ).toISOString(),
           likes: Math.floor(Math.random() * 100),
+          name: 'name4',
+          userId: 'userId4',
         },
       ],
     })
 
     this.client.send(MessagePatFromGateway.GetAllByActivityId, activityId).pipe(
-      map<
-        any,
-        {
-          id: string
-          content: string
-          createdAt: string
-          likes: number
-        }
-      >((res) => {
+      map<any, ChatMessage>((res) => {
         console.log('>>> | res', res)
         // TODO map res
         return {
@@ -177,6 +180,8 @@ export class ChatService {
           content: 'content' + Math.random(),
           createdAt: new Date().toISOString(),
           likes: Math.floor(Math.random() * 100),
+          name: 'name',
+          userId: 'userId',
         }
       }),
       toArray(),
