@@ -1,20 +1,33 @@
-import { toArray } from 'rxjs/operators'
+import { z } from 'nestjs-zod/z'
 import { catchError, map, Observable, of } from 'rxjs'
+import { toArray } from 'rxjs/operators'
 
 import { Inject, Injectable } from '@nestjs/common'
 
-import { MessagePatFromGateway } from './synced-configs'
 import {
-  ChatMessage,
+  chatMessageSchema,
   ChatServer,
   ChatSocket,
   ClientEmitDto,
   clientEmitDto,
   T,
 } from './socket.type'
+import { MessagePatFromGateway } from './synced-configs'
 
 import type { ClientRMQ } from '@nestjs/microservices'
+import { prismaClient } from 'prisma/script'
+
 type ObservableOr<T> = T | Observable<T>
+
+const chatMsgSchemaFromChatService = chatMessageSchema
+  .omit({
+    name: true,
+  })
+  .extend({
+    activityId: z.string(),
+  })
+
+type ChatMsgFromChatService = z.infer<typeof chatMsgSchemaFromChatService>
 
 @Injectable()
 export class ChatService {
@@ -30,13 +43,11 @@ export class ChatService {
 
     return this.client.send(MessagePatFromGateway.Favorite, result.parsed).pipe(
       map((res) => {
-        console.log('>>> | res', res)
-        // TODO map res to T['favorite']['res']
+        const parsed = chatMsgSchemaFromChatService
+          .pick({ id: true, likes: true })
+          .parse(res)
         const r: T['favorite']['res'] = {
-          data: {
-            id: 'id',
-            likes: 1,
-          },
+          data: parsed,
         }
         this.server.to(activityId).emit('favorited', r)
         return r
@@ -64,23 +75,36 @@ export class ChatService {
     }
 
     return this.client
-      .send<any, PostPayload>(MessagePatFromGateway.Post, {
+      .send<ChatMsgFromChatService, PostPayload>(MessagePatFromGateway.Post, {
         activityId,
         userId,
         content: result.parsed.content,
       })
       .pipe(
-        map((res) => {
+        map(async (res) => {
           console.log('>>> | res', res)
           // TODO map res to T['post']['res']
+          const user = await prismaClient.user.findUnique({
+            where: {
+              id: userId,
+            },
+            select: {
+              name: true,
+            },
+          })
+
+          if (!user) {
+            throw `User with id ${userId} not found`
+          }
+
           const r: T['post']['res'] = {
             data: {
-              id: 'id',
-              content: 'content',
-              createdAt: new Date().toISOString(),
-              likes: 0,
-              userId: 'userId',
-              name: 'name',
+              id: res.id,
+              content: res.content,
+              createdAt: res.createdAt,
+              likes: res.likes,
+              userId: res.userId,
+              name: user.name,
             },
           }
           this.server.to(activityId).emit('posted', r)
@@ -125,70 +149,45 @@ export class ChatService {
     // room name is the activityId
     client.join(activityId)
 
-    // TODO: remove this once we have a response from the call to chat service
-    this.server.to(activityId).emit('initialData', {
-      data: [
-        {
-          id: Math.random().toString(),
-          content: 'content' + Math.random(),
-          createdAt: new Date(
-            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-          likes: Math.floor(Math.random() * 100),
-          userId: 'userId',
-          name: 'name',
-        },
-        {
-          id: Math.random().toString(),
-          content: 'content' + Math.random(),
-          createdAt: new Date(
-            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-          likes: Math.floor(Math.random() * 100),
-          userId: 'userId2',
-          name: 'name2',
-        },
-        {
-          id: Math.random().toString(),
-          content: 'content' + Math.random(),
-          createdAt: new Date(
-            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-          likes: Math.floor(Math.random() * 100),
-          userId: 'userId3',
-          name: 'name3',
-        },
-        {
-          id: Math.random().toString(),
-          content: 'content' + Math.random(),
-          createdAt: new Date(
-            Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-          likes: Math.floor(Math.random() * 100),
-          name: 'name4',
-          userId: 'userId4',
-        },
-      ],
-    })
+    this.client
+      .send<ChatMsgFromChatService>(
+        MessagePatFromGateway.GetAllByActivityId,
+        activityId,
+      )
+      .pipe(
+        toArray(),
+        map(async (data) => {
+          chatMsgSchemaFromChatService.array().parse(data)
 
-    this.client.send(MessagePatFromGateway.GetAllByActivityId, activityId).pipe(
-      map<any, ChatMessage>((res) => {
-        console.log('>>> | res', res)
-        // TODO map res
-        return {
-          id: Math.random().toString(),
-          content: 'content' + Math.random(),
-          createdAt: new Date().toISOString(),
-          likes: Math.floor(Math.random() * 100),
-          name: 'name',
-          userId: 'userId',
-        }
-      }),
-      toArray(),
-      map((data) => {
-        this.server.to(activityId).emit('initialData', { data })
-      }),
-    )
+          const userIds = data.map((d) => d.userId)
+          const users = await prismaClient.user.findMany({
+            where: {
+              id: {
+                in: userIds,
+              },
+            },
+            select: {
+              name: true,
+              id: true,
+            },
+          })
+          this.server.to(activityId).emit('initialData', {
+            data: data.map((d) => {
+              const user = users.find((u) => u.id === d.userId)
+              return {
+                ...d,
+                name: user?.name as string,
+              }
+            }),
+          })
+        }),
+        catchError((error) => {
+          this.server.to(activityId).emit('initialData', {
+            error,
+          })
+          return of(null)
+        }),
+      )
   }
 
   handleDisconnect(client: ChatSocket) {

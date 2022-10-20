@@ -72,8 +72,8 @@ export interface T {
     emit: ClientEmit<ClientEmitDto<'echo'>, T['echo']['res']>
   }
   post: {
-    res: WsRes<ChatMessage>
-    emit: ClientEmit<ClientEmitDto<'post'>, T['post']['res']>
+    res: Promise<WsRes<ChatMessage>> | WsRes<ChatMessage>
+    emit: ClientEmit<ClientEmitDto<'post'>, WsRes<ChatMessage>>
   }
   favorite: {
     res: WsRes<ChatMsgLikesUpdated>
