@@ -37,12 +37,11 @@ export class ChatService {
 
   initialData(activityId: string) {
     return this.client
-      .send<ChatMsgFromChatService>(
+      .send<ChatMsgFromChatService[]>(
         MessagePatFromGateway.GetAllByActivityId,
         activityId,
       )
       .pipe(
-        toArray(),
         map(async (data) => {
           chatMsgSchemaFromChatService.array().parse(data)
 
