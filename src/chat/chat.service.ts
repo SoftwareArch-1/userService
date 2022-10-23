@@ -87,7 +87,7 @@ export class ChatService {
 
     return this.client
       .send(MessagePatFromGateway.Favorite, {
-        messageId: result.parsed,
+        messageId: result.parsed.messageId,
         userId,
       })
       .pipe(
