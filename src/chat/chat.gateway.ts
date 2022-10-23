@@ -42,7 +42,7 @@ export class ChatGateway
 
   @SubscribeMessage<ClientToServerEventNames>('favorite')
   favorite(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
-    return this.chatService.favorite(data, socket.data.activityId as string)
+    return this.chatService.favorite(data, socket.data.activityId as string, socket.data.userId as string)
   }
 
   @SubscribeMessage<ClientToServerEventNames>('initialData')

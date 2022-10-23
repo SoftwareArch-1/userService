@@ -75,27 +75,36 @@ export class ChatService {
       )
   }
 
-  favorite(data: any, activityId: string): ObservableOr<T['favorite']['res']> {
+  favorite(
+    data: any,
+    activityId: string,
+    userId: string,
+  ): ObservableOr<T['favorite']['res']> {
     const result = parseDto(data, 'favorite')
     if (!result.success) {
       return { error: result.error }
     }
 
-    return this.client.send(MessagePatFromGateway.Favorite, result.parsed).pipe(
-      map((res) => {
-        const parsed = chatMsgSchemaFromChatService
-          .pick({ id: true, likedUsers: true })
-          .parse(res)
-        const r: T['favorite']['res'] = {
-          data: parsed,
-        }
-        this.server.to(activityId).emit('favorited', r)
-        return r
-      }),
-      catchError((error) => {
-        return of({ error })
-      }),
-    )
+    return this.client
+      .send(MessagePatFromGateway.Favorite, {
+        messageId: result.parsed,
+        userId,
+      })
+      .pipe(
+        map((res) => {
+          const parsed = chatMsgSchemaFromChatService
+            .pick({ id: true, likedUsers: true })
+            .parse(res)
+          const r: T['favorite']['res'] = {
+            data: parsed,
+          }
+          this.server.to(activityId).emit('favorited', r)
+          return r
+        }),
+        catchError((error) => {
+          return of({ error })
+        }),
+      )
   }
 
   post(
