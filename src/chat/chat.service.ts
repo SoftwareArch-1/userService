@@ -171,7 +171,7 @@ export class ChatService {
               id: true,
             },
           })
-          this.server.to(activityId).emit('initialData', {
+          this.server.to(client.id).emit('initialData', {
             data: data.map((d) => {
               const user = users.find((u) => u.id === d.userId)
               return {
@@ -182,7 +182,7 @@ export class ChatService {
           })
         }),
         catchError((error) => {
-          this.server.to(activityId).emit('initialData', {
+          this.server.to(client.id).emit('initialData', {
             error,
           })
           return of({
