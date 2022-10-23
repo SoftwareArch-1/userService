@@ -32,7 +32,6 @@ interface ServerToClientEvents {
    * Clients should listen to this event to receive error messages from the server
    */
   err: (msg: string) => void
-  initialData: ServerEmit<ChatMessage[]>
   /**
    * Emits when a new post is created
    */
@@ -79,12 +78,17 @@ export interface T {
     res: WsRes<ChatMsgLikesUpdated>
     emit: ClientEmit<ClientEmitDto<'favorite'>, T['favorite']['res']>
   }
+  initialData: {
+    res: WsRes<ChatMessage[]>
+    emit: (cb?: Ack<T['initialData']['res']>) => void
+  }
 }
 
 interface ClientToServerEvents {
   echo: T['echo']['emit']
   post: T['post']['emit']
   favorite: T['favorite']['emit']
+  initialData: T['initialData']['emit']
 }
 
 export type ClientToServerEventNames = keyof ClientToServerEvents

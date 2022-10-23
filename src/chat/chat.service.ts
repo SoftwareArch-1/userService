@@ -35,6 +35,47 @@ export class ChatService {
     @Inject('CHAT_SERVICE_CLIENT') private readonly client: ClientRMQ,
   ) {}
 
+  initialData(activityId: string) {
+    return this.client
+      .send<ChatMsgFromChatService>(
+        MessagePatFromGateway.GetAllByActivityId,
+        activityId,
+      )
+      .pipe(
+        toArray(),
+        map(async (data) => {
+          chatMsgSchemaFromChatService.array().parse(data)
+
+          const userIds = data.map((d) => d.userId)
+          const users = await prismaClient.user.findMany({
+            where: {
+              id: {
+                in: userIds,
+              },
+            },
+            select: {
+              name: true,
+              id: true,
+            },
+          })
+          return {
+            data: data.map((d) => {
+              const user = users.find((u) => u.id === d.userId)
+              return {
+                ...d,
+                name: user?.name as string,
+              }
+            }),
+          }
+        }),
+        catchError((error) => {
+          return of({
+            error,
+          })
+        }),
+      )
+  }
+
   favorite(data: any, activityId: string): ObservableOr<T['favorite']['res']> {
     const result = parseDto(data, 'favorite')
     if (!result.success) {
@@ -148,48 +189,6 @@ export class ChatService {
 
     // room name is the activityId
     client.join(activityId)
-
-    this.client
-      .send<ChatMsgFromChatService>(
-        MessagePatFromGateway.GetAllByActivityId,
-        activityId,
-      )
-      .pipe(
-        toArray(),
-        map(async (data) => {
-          chatMsgSchemaFromChatService.array().parse(data)
-
-          const userIds = data.map((d) => d.userId)
-          const users = await prismaClient.user.findMany({
-            where: {
-              id: {
-                in: userIds,
-              },
-            },
-            select: {
-              name: true,
-              id: true,
-            },
-          })
-          this.server.to(client.id).emit('initialData', {
-            data: data.map((d) => {
-              const user = users.find((u) => u.id === d.userId)
-              return {
-                ...d,
-                name: user?.name as string,
-              }
-            }),
-          })
-        }),
-        catchError((error) => {
-          this.server.to(client.id).emit('initialData', {
-            error,
-          })
-          return of({
-            error,
-          })
-        }),
-      )
   }
 
   handleDisconnect(client: ChatSocket) {

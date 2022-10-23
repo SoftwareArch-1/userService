@@ -33,12 +33,21 @@ export class ChatGateway
 
   @SubscribeMessage<ClientToServerEventNames>('post')
   post(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
-    return this.chatService.post(data, socket.data.activityId as string, socket.data.userId as string)
+    return this.chatService.post(
+      data,
+      socket.data.activityId as string,
+      socket.data.userId as string,
+    )
   }
 
   @SubscribeMessage<ClientToServerEventNames>('favorite')
   favorite(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
     return this.chatService.favorite(data, socket.data.activityId as string)
+  }
+
+  @SubscribeMessage<ClientToServerEventNames>('initialData')
+  initialData(@ConnectedSocket() socket: ChatSocket) {
+    return this.chatService.initialData(socket.data.activityId as string)
   }
 
   @SubscribeMessage<ClientToServerEventNames>('echo')
