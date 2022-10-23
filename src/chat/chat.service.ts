@@ -185,7 +185,9 @@ export class ChatService {
           this.server.to(activityId).emit('initialData', {
             error,
           })
-          return of(null)
+          return of({
+            error,
+          })
         }),
       )
   }
