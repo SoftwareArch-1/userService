@@ -84,7 +84,7 @@ export class ChatService {
     return this.client.send(MessagePatFromGateway.Favorite, result.parsed).pipe(
       map((res) => {
         const parsed = chatMsgSchemaFromChatService
-          .pick({ id: true, likes: true })
+          .pick({ id: true, likedUsers: true })
           .parse(res)
         const r: T['favorite']['res'] = {
           data: parsed,
@@ -122,8 +122,6 @@ export class ChatService {
       })
       .pipe(
         concatMap(async (res) => {
-          console.log('>>> | res', res)
-          // TODO map res to T['post']['res']
           const user = await prismaClient.user.findUnique({
             where: {
               id: userId,
@@ -142,9 +140,9 @@ export class ChatService {
               id: res.id,
               content: res.content,
               createdAt: res.createdAt,
-              likes: res.likes,
               userId: res.userId,
               name: user.name,
+              likedUsers: res.likedUsers,
             },
           }
           this.server.to(activityId).emit('posted', r)
