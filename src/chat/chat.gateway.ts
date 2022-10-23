@@ -11,7 +11,9 @@ import {
 import { ChatService } from './chat.service'
 import { ChatServer, ChatSocket, ClientToServerEventNames } from './socket.type'
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: true,
+})
 export class ChatGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
 {
@@ -31,7 +33,7 @@ export class ChatGateway
 
   @SubscribeMessage<ClientToServerEventNames>('post')
   post(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
-    return this.chatService.post(data, socket.data.activityId as string)
+    return this.chatService.post(data, socket.data.activityId as string, socket.data.userId as string)
   }
 
   @SubscribeMessage<ClientToServerEventNames>('favorite')
