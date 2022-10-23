@@ -1,6 +1,6 @@
 import { z } from 'nestjs-zod/z'
 import { catchError, map, Observable, of } from 'rxjs'
-import { toArray } from 'rxjs/operators'
+import { concatMap, toArray } from 'rxjs/operators'
 
 import { Inject, Injectable } from '@nestjs/common'
 
@@ -42,7 +42,7 @@ export class ChatService {
         activityId,
       )
       .pipe(
-        map(async (data) => {
+        concatMap(async (data) => {
           chatMsgSchemaFromChatService.array().parse(data)
 
           const userIds = data.map((d) => d.userId)
@@ -121,7 +121,7 @@ export class ChatService {
         content: result.parsed.content,
       })
       .pipe(
-        map(async (res) => {
+        concatMap(async (res) => {
           console.log('>>> | res', res)
           // TODO map res to T['post']['res']
           const user = await prismaClient.user.findUnique({
