@@ -198,11 +198,13 @@ export class ActivityController implements OnModuleInit {
     return this.activityService.findOne({ id }).pipe(
       map((data) => ActivityModel.parse(data)),
       map(async ({ joinedUserIds, ownerId, pendingUserIds, ...rest }) => {
-        const users = await findUsers([ownerId, ...joinedUserIds])
+        const [owned, joined] = await Promise.all([
+          findUsers([ownerId]),
+          findUsers([...joinedUserIds]),
+        ])
 
-        const activityUsers = users.map(makeActivityUser)
-        const owner = activityUsers.slice(0, 1)[0]
-        const joinedUsers = activityUsers.slice(1)
+        const owner = owned.map(makeActivityUser)[0]
+        const joinedUsers = joined.map(makeActivityUser)
 
         if (ownerId === req.user.id) {
           const dto: FindOneByOwner = {
