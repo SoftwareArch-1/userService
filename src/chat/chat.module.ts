@@ -12,7 +12,7 @@ import { queueNames } from './synced-configs'
         name: 'CHAT_SERVICE_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'], // TODO: move to env with the actual host. Where is the host of the rabbitmq server?
+          urls: [process.env.RMQ_URL as string],
           queue: queueNames.fromGateway,
           queueOptions: {
             durable: false,
