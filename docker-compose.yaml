@@ -1,5 +1,9 @@
 version: '3.8'
 services:
+  app:
+    build: .
+    ports:
+      - 4000:4000
   dev-db:
     image: postgres:13
     ports:
