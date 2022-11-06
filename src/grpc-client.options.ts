@@ -7,5 +7,6 @@ export const grpcClientOptions: ClientOptions = {
     package: 'sync_with_activity', // ['hero', 'hero2']
     protoPath: join(__dirname, './sync_with_activity/activity.proto'), // ['./hero/hero.proto', './hero/hero2.proto']
     loader: { keepCase: true },
+    url: process.env.ACTIVITY_SERVICE,
   },
 }
