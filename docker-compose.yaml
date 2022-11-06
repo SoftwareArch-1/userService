@@ -3,6 +3,8 @@ services:
   app:
     build: .
     container_name: user_service_gateway
+    networks:
+      - sa
     ports:
       - 4000:4000
   dev-db:
