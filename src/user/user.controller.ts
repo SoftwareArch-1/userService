@@ -45,6 +45,7 @@ export class UserController {
 
   @Get('all')
   findAll() {
+    console.log('hi')
     return this.userService.findAll()
   }
 

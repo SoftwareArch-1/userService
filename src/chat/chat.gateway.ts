@@ -12,7 +12,10 @@ import { ChatService } from './chat.service'
 import { ChatServer, ChatSocket, ClientToServerEventNames } from './socket.type'
 
 @WebSocketGateway({
-  cors: true,
+  cors: {
+    credentials: true,
+    origin: process.env.Cors_Origin,
+  },
 })
 export class ChatGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -42,7 +45,11 @@ export class ChatGateway
 
   @SubscribeMessage<ClientToServerEventNames>('favorite')
   favorite(@MessageBody() data: any, @ConnectedSocket() socket: ChatSocket) {
-    return this.chatService.favorite(data, socket.data.activityId as string, socket.data.userId as string)
+    return this.chatService.favorite(
+      data,
+      socket.data.activityId as string,
+      socket.data.userId as string,
+    )
   }
 
   @SubscribeMessage<ClientToServerEventNames>('initialData')
