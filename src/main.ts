@@ -5,6 +5,7 @@ import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 import { AppModule } from './app.module'
+import { RedisIoAdapter } from './chat/redis-io-adpator'
 
 patchNestJsSwagger()
 
@@ -35,6 +36,12 @@ async function bootstrap() {
     credentials: true,
     origin: true,
   })
+
+  // redis adapter for socket.io to sync rooms across multiple socket servers
+  const redisIoAdapter = new RedisIoAdapter(app)
+  await redisIoAdapter.connectToRedis()
+
+  app.useWebSocketAdapter(redisIoAdapter)
 
   await app.listen(4000)
   console.log(`Application is running on: ${await app.getUrl()}`)
