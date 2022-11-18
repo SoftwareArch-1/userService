@@ -13,8 +13,8 @@ import { ChatServer, ChatSocket, ClientToServerEventNames } from './socket.type'
 
 @WebSocketGateway({
   cors: {
-    credentials: true,
-    origin: process.env.Cors_Origin,
+    credentials: false,
+    origin: true,
   },
 })
 export class ChatGateway
